@@ -60,7 +60,7 @@ O sistema permite:
 
 ## Integrantes
 
-- Cauã Thomas Thomarco Teixeira  
+- Cauã Thomarco Thomaz Teixeira  
 - Guilherme Augusto da Silva Machado  
 - Sofia Figueiredo de Oliveira  
 
