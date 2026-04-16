@@ -1,0 +1,200 @@
+.categories-bar {
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+  position: sticky;
+  top: 72px;
+  z-index: 900;
+}
+
+.categories-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.categories-inner::-webkit-scrollbar { display: none; }
+
+.category-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 20px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gray-400);
+  border-bottom: 2px solid transparent;
+  transition: var(--transition);
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.category-btn:hover { color: var(--dark-blue); border-bottom-color: var(--gray-200); }
+.category-btn.active { color: var(--dark-blue); border-bottom-color: var(--dark-blue); }
+.category-btn .icon { font-size: 22px; margin-bottom: 2px; }
+
+/* Listings */
+.section { max-width: 1280px; margin: 0 auto; padding: 48px 32px; }
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  color: var(--dark-blue);
+  letter-spacing: -0.3px;
+}
+
+.section-link {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--light-blue);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: var(--transition);
+}
+.section-link:hover { border-bottom-color: var(--light-blue); }
+
+/* Cards Grid */
+.listings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 28px;
+}
+
+.card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: var(--transition);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card-img-wrap {
+  position: relative;
+  aspect-ratio: 4/3;
+  overflow: hidden;
+}
+
+.card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.card:hover .card-img { transform: scale(1.06); }
+
+.card-img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;
+}
+
+.card-fav {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  transition: var(--transition);
+  backdrop-filter: blur(4px);
+}
+.card-fav:hover { transform: scale(1.15); background: white; }
+
+.card-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: var(--dark-blue);
+  color: white;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-body { padding: 16px; }
+
+.card-location {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.card-city {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--gray-800);
+}
+
+.card-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dark-blue);
+}
+
+.card-name {
+  font-size: 14px;
+  color: var(--gray-600);
+  margin-bottom: 4px;
+}
+
+.card-dates {
+  font-size: 13px;
+  color: var(--gray-400);
+  margin-bottom: 12px;
+}
+
+.card-price {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--dark-blue);
+}
+.card-price span { font-size: 13px; font-family: var(--font-body); color: var(--gray-600); font-weight: 500; }
+
+/* Gradient card backgrounds */
+.grad-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.grad-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.grad-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.grad-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.grad-5 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.grad-6 { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); }
+.grad-7 { background: linear-gradient(135deg, #fccb90 0%, #d57eeb 100%); }
+.grad-8 { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); }
