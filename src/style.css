@@ -254,3 +254,68 @@
   opacity: 0.8;
   font-weight: 600;
 }
+
+.experiences-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.exp-card {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  transition: var(--transition);
+  aspect-ratio: 9/10;
+}
+
+.exp-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-xl); }
+
+.exp-bg {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 100px;
+  position: absolute;
+  inset: 0;
+}
+
+.exp-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,31,101,0.9) 0%, transparent 50%);
+}
+
+.exp-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 28px 24px;
+  color: white;
+}
+
+.exp-tag {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--light-blue);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.exp-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.exp-price {
+  font-size: 14px;
+  opacity: 0.85;
+  font-weight: 600;
+}
