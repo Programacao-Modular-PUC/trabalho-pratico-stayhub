@@ -1183,3 +1183,137 @@
     </div>
   </section>
 
+          <div class="host-avatar">M</div>
+        </div>
+
+        <!-- Features -->
+        <div class="detail-features">
+          <div class="feature">
+            <span class="feature-icon">🏆</span>
+            <div class="feature-text">
+              <strong>Mariana é Superhost</strong>
+              Anfitriões experientes e bem avaliados
+            </div>
+          </div>
+          <div class="feature">
+            <span class="feature-icon">📍</span>
+            <div class="feature-text">
+              <strong>Localização ótima</strong>
+              95% dos hóspedes elogiaram
+            </div>
+          </div>
+          <div class="feature">
+            <span class="feature-icon">🔑</span>
+            <div class="feature-text">
+              <strong>Auto check-in</strong>
+              Faça o check-in sozinho
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="detail-desc">
+          <h3 style="font-family: var(--font-display); font-size: 22px; color: var(--dark-blue); margin-bottom: 16px;">Sobre este espaço</h3>
+          Bem-vindo à nossa cobertura exclusiva com vista panorâmica para o mar! Localizada no coração de Florianópolis, a apenas 200m da Praia de Jurerê Internacional, esta propriedade oferece uma experiência única de hospedagem com todo o conforto e privacidade que você merece.
+          <br><br>
+          O espaço conta com dois quartos espaçosos, sala de estar ampla com sofá cama, cozinha totalmente equipada e uma varanda deslumbrante com vista 180° para o oceano. Perfeito para casais, famílias ou grupos de amigos.
+        </div>
+
+        <!-- Amenities -->
+        <h3 style="font-family: var(--font-display); font-size: 22px; color: var(--dark-blue); margin-bottom: 20px;">O que este lugar oferece</h3>
+        <div class="amenities-grid" style="margin-bottom: 40px;">
+          <div class="amenity"><span class="amenity-icon">🌊</span> Vista para o mar</div>
+          <div class="amenity"><span class="amenity-icon">🏊</span> Piscina privativa</div>
+          <div class="amenity"><span class="amenity-icon">📶</span> Wi-Fi de alta velocidade</div>
+          <div class="amenity"><span class="amenity-icon">🅿️</span> Estacionamento gratuito</div>
+          <div class="amenity"><span class="amenity-icon">❄️</span> Ar-condicionado</div>
+          <div class="amenity"><span class="amenity-icon">🍳</span> Cozinha completa</div>
+          <div class="amenity"><span class="amenity-icon">📺</span> TV a cabo</div>
+          <div class="amenity"><span class="amenity-icon">🔒</span> Portaria 24h</div>
+          <div class="amenity"><span class="amenity-icon">🏋️</span> Academia</div>
+          <div class="amenity"><span class="amenity-icon">🐾</span> Aceita pets</div>
+        </div>
+
+        <!-- Reviews -->
+        <h3 style="font-family: var(--font-display); font-size: 22px; color: var(--dark-blue); margin-bottom: 20px;">★ 4.97 · 128 avaliações</h3>
+        <div class="reviews-summary">
+          <div class="review-big-score">4.97</div>
+          <div class="review-bars">
+            <div class="review-bar-row">Limpeza <div class="review-bar-track"><div class="review-bar-fill" style="width:99%"></div></div> 5.0</div>
+            <div class="review-bar-row">Comunicação <div class="review-bar-track"><div class="review-bar-fill" style="width:97%"></div></div> 4.9</div>
+            <div class="review-bar-row">Check-in <div class="review-bar-track"><div class="review-bar-fill" style="width:99%"></div></div> 5.0</div>
+            <div class="review-bar-row">Localização <div class="review-bar-track"><div class="review-bar-fill" style="width:95%"></div></div> 4.8</div>
+            <div class="review-bar-row">Valor <div class="review-bar-track"><div class="review-bar-fill" style="width:93%"></div></div> 4.7</div>
+          </div>
+        </div>
+        <div class="review-cards" style="margin-top: 24px;">
+          <div class="review-card">
+            <div class="review-header">
+              <div class="reviewer-avatar">L</div>
+              <div><div class="reviewer-name">Lucas M.</div><div class="reviewer-date">Janeiro 2025</div></div>
+            </div>
+            <div class="review-text">Incrível! A vista para o mar é de tirar o fôlego. O apartamento é exatamente como nas fotos e a Mariana foi super atenciosa. Com certeza voltaremos!</div>
+          </div>
+          <div class="review-card">
+            <div class="review-header">
+              <div class="reviewer-avatar">A</div>
+              <div><div class="reviewer-name">Ana C.</div><div class="reviewer-date">Dezembro 2024</div></div>
+            </div>
+            <div class="review-text">Passamos o Réveillon aqui e foi perfeito. A localização é ótima, próximo de tudo. O apartamento é lindo e muito confortável. Recomendo muito!</div>
+          </div>
+          <div class="review-card">
+            <div class="review-header">
+              <div class="reviewer-avatar">R</div>
+              <div><div class="reviewer-name">Rafael S.</div><div class="reviewer-date">Novembro 2024</div></div>
+            </div>
+            <div class="review-text">Melhor hospedagem da nossa viagem a Floripa. Piscina maravilhosa, vista deslumbrante, apartamento super limpo. Voltaríamos amanhã se pudéssemos!</div>
+          </div>
+          <div class="review-card">
+            <div class="review-header">
+              <div class="reviewer-avatar">J</div>
+              <div><div class="reviewer-name">Juliana P.</div><div class="reviewer-date">Outubro 2024</div></div>
+            </div>
+            <div class="review-text">Experiência 10/10! O check-in automático é muito prático. A cobertura é ainda mais bonita pessoalmente. A Mariana é uma anfitriã maravilhosa.</div>
+          </div>
+        </div>
+
+      </div><!-- /detail-info -->
+
+      <!-- Booking Card -->
+      <div>
+        <div class="booking-card">
+          <div class="booking-price">R$ 680 <span>/ noite</span></div>
+          <div class="booking-rating">★ 4.97 · 128 avaliações</div>
+
+          <div class="booking-fields">
+            <div class="booking-fields-row">
+              <div class="booking-field" style="border-right: 1px solid var(--gray-200);">
+                <div class="booking-field-label">Check-in</div>
+                <div class="booking-field-value">15/01/2025</div>
+              </div>
+              <div class="booking-field">
+                <div class="booking-field-label">Check-out</div>
+                <div class="booking-field-value">22/01/2025</div>
+              </div>
+            </div>
+            <div class="booking-field">
+              <div class="booking-field-label">Hóspedes</div>
+              <div class="booking-field-value">2 hóspedes</div>
+            </div>
+          </div>
+
+          <button class="booking-btn">Reservar agora</button>
+          <div class="booking-note">Você não será cobrado ainda</div>
+
+          <div class="booking-breakdown">
+            <div class="breakdown-row"><span>R$ 680 × 7 noites</span><span>R$ 4.760</span></div>
+            <div class="breakdown-row"><span>Taxa de limpeza</span><span>R$ 180</span></div>
+            <div class="breakdown-row"><span>Taxa de serviço StayHub</span><span>R$ 320</span></div>
+            <div class="breakdown-row total"><span>Total</span><span>R$ 5.260</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /detail-body -->
+  </div><!-- /detail-page -->
+</div><!-- /page-detail -->
