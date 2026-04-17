@@ -1317,3 +1317,52 @@
     </div><!-- /detail-body -->
   </div><!-- /detail-page -->
 </div><!-- /page-detail -->
+
+          <li><a href="#">Recursos para anfitriões</a></li>
+          <li><a href="#">Fórum da comunidade</a></li>
+          <li><a href="#">Como ser Superhost</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 StayHub, Inc. Todos os direitos reservados.</div>
+      <div class="footer-links">
+        <a href="#">Privacidade</a>
+        <a href="#">Termos</a>
+        <a href="#">Mapa do site</a>
+      </div>
+      <div class="footer-lang">🌐 Português (BR) &nbsp; R$ BRL</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Page navigation
+function showPage(page) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("page-" + page).classList.add("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// Category buttons
+document.querySelectorAll(".category-btn").forEach(btn => {
+  btn.addEventListener("click", function() {
+    this.closest(".categories-inner").querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
+    this.classList.add("active");
+  });
+});
+
+// Fade-in on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("visible");
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll(".fade-in").forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
