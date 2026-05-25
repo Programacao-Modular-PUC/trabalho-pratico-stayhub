@@ -1,0 +1,11 @@
+{
+  "name": "stayhub-frontend",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "http-server . -p 3000 -o stayhub.html --cors -c-1",
+    "start": "http-server . -p 3000 -o stayhub.html --cors -c-1"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
