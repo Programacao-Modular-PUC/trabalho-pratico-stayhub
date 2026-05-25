@@ -1,5 +1,6 @@
 package com.puc.stayhub.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -33,6 +34,7 @@ public class Residencia {
     @Column(length = 2)
     private String uf;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "residencia", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Quarto> quartos = new ArrayList<>();
 

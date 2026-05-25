@@ -29,6 +29,7 @@
       </button>
     </div>
     <div class="nav-actions">
+      <button class="nav-btn nav-btn-ghost" onclick="showPage('admin')" style="background:var(--dark-blue);color:#fff">⚙️ Admin</button>
       <button class="nav-btn nav-btn-ghost">Anuncie seu espaço</button>
       <div class="nav-user">
         <span class="nav-user-icon">☰</span>
@@ -137,7 +138,7 @@
       </div>
       <a class="section-link" onclick="showPage('listings')">Ver todos →</a>
     </div>
-    <div class="listings-grid">
+    <div class="listings-grid" id="featured-container">
 
       <div class="card" onclick="showPage('detail')">
         <div class="card-img-wrap">
@@ -329,7 +330,7 @@
         ⚙️ Filtros
       </button>
     </div>
-    <div class="listings-grid">
+    <div class="listings-grid" id="listings-container">
       <div class="card" onclick="showPage('detail')">
         <div class="card-img-wrap"><div class="card-img-placeholder grad-3">🏖️</div><button class="card-fav">♡</button><div class="card-badge">⭐ Mais amado</div></div>
         <div class="card-body">
@@ -413,10 +414,10 @@
 
     <button class="detail-back" onclick="showPage('listings')">← Voltar para resultados</button>
 
-    <h1 class="detail-title">Cobertura com vista panorâmica para o mar</h1>
+    <h1 class="detail-title" id="detail-nome">Cobertura com vista panorâmica para o mar</h1>
     <div class="detail-meta">
       <span class="detail-meta-item highlight">★ 4.97 · <u style="cursor:pointer">128 avaliações</u></span>
-      <span class="detail-meta-item">📍 Florianópolis, Santa Catarina, Brasil</span>
+      <span class="detail-meta-item" id="detail-local">📍 Florianópolis, Santa Catarina, Brasil</span>
       <span class="detail-meta-item">🏆 Anfitrião Superhost</span>
     </div>
 
@@ -535,39 +536,167 @@
 
       <div>
         <div class="booking-card">
-          <div class="booking-price">R$ 680 <span>/ noite</span></div>
-          <div class="booking-rating">★ 4.97 · 128 avaliações</div>
+          <div class="booking-price" id="detail-preco">R$ -- <span>/ noite</span></div>
+          <div class="booking-rating" id="detail-tipo">Selecione uma acomodação nas listagens</div>
 
           <div class="booking-fields">
             <div class="booking-fields-row">
               <div class="booking-field" style="border-right: 1px solid var(--gray-200);">
                 <div class="booking-field-label">Check-in</div>
-                <div class="booking-field-value">15/01/2025</div>
+                <input type="date" id="al-m-inicio" class="booking-input">
               </div>
               <div class="booking-field">
                 <div class="booking-field-label">Check-out</div>
-                <div class="booking-field-value">22/01/2025</div>
+                <input type="date" id="al-m-fim" class="booking-input">
               </div>
             </div>
             <div class="booking-field">
-              <div class="booking-field-label">Hóspedes</div>
-              <div class="booking-field-value">2 hóspedes</div>
+              <div class="booking-field-label">Nº de hóspedes</div>
+              <input type="number" id="al-m-hospedes" min="1" value="1" class="booking-input">
             </div>
+            <div class="booking-field">
+              <div class="booking-field-label">Cliente</div>
+              <select id="al-m-clienteId" class="booking-input"><option value="">-- Selecione um cliente --</option></select>
+            </div>
+            <label style="display:flex;align-items:center;gap:8px;padding:8px 0;font-size:14px;cursor:pointer">
+              <input type="checkbox" id="al-m-berco"> Solicitar berço
+            </label>
           </div>
 
-          <button class="booking-btn">Reservar agora</button>
-          <div class="booking-note">Você não será cobrado ainda</div>
-
-          <div class="booking-breakdown">
-            <div class="breakdown-row"><span>R$ 680 × 7 noites</span><span>R$ 4.760</span></div>
-            <div class="breakdown-row"><span>Taxa de limpeza</span><span>R$ 180</span></div>
-            <div class="breakdown-row"><span>Taxa de serviço StayHub</span><span>R$ 320</span></div>
-            <div class="breakdown-row total"><span>Total</span><span>R$ 5.260</span></div>
-          </div>
+          <input type="hidden" id="al-m-quartoId">
+          <button class="booking-btn" onclick="confirmarReservaModal()">Reservar agora</button>
+          <div class="booking-note">Confirmação enviada após a reserva</div>
+          <div id="modal-msg" style="margin-top:12px;font-weight:700;font-size:14px;text-align:center"></div>
         </div>
       </div>
 
     </div>
+  </div>
+</div>
+
+<div id="page-admin" class="page">
+  <div style="max-width:1100px;margin:0 auto;padding:40px 24px;font-family:var(--font-body)">
+    <h1 style="font-size:28px;font-weight:800;margin-bottom:6px">⚙️ Painel Administrativo</h1>
+    <p style="color:#6b7280;margin-bottom:28px">Gerencie residências, quartos, clientes e aluguéis do sistema StayHub</p>
+
+    <div style="display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap">
+      <button onclick="adminTab('residencias')" id="tab-residencias" class="admin-tab active">🏠 Residências</button>
+      <button onclick="adminTab('quartos')" id="tab-quartos" class="admin-tab">🛏️ Quartos</button>
+      <button onclick="adminTab('clientes')" id="tab-clientes" class="admin-tab">👤 Clientes</button>
+      <button onclick="adminTab('alugueis')" id="tab-alugueis" class="admin-tab">📋 Aluguéis</button>
+    </div>
+
+    <!-- Residencias -->
+    <div id="admin-residencias">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+        <div>
+          <h3 style="margin-bottom:16px;font-weight:700">Cadastrar Residência</h3>
+          <div class="admin-form">
+            <input id="res-nome" placeholder="Nome*" class="admin-input">
+            <input id="res-endereco" placeholder="Endereço*" class="admin-input">
+            <input id="res-cidade" placeholder="Cidade" class="admin-input">
+            <input id="res-uf" placeholder="UF (ex: SP)" maxlength="2" class="admin-input">
+            <button onclick="criarResidencia()" class="admin-btn">Cadastrar Residência</button>
+          </div>
+        </div>
+        <div>
+          <h3 style="margin-bottom:16px;font-weight:700">Residências cadastradas</h3>
+          <div id="lista-residencias" class="admin-list"><p style="color:#9ca3af">Carregando...</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quartos -->
+    <div id="admin-quartos" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+        <div>
+          <h3 style="margin-bottom:16px;font-weight:700">Cadastrar Quarto</h3>
+          <div class="admin-form">
+            <select id="q-tipo" class="admin-input" onchange="atualizarCamposQuarto()">
+              <option value="">-- Tipo do quarto* --</option>
+              <option value="INDIVIDUAL">Individual (camas solteiro)</option>
+              <option value="DUPLO">Duplo / Casal</option>
+              <option value="FAMILIA">Família</option>
+            </select>
+            <input id="q-valorBase" type="number" placeholder="Valor base R$/noite*" class="admin-input">
+            <select id="q-residenciaId" class="admin-input">
+              <option value="">-- Selecione a residência* --</option>
+            </select>
+            <label class="admin-check"><input type="checkbox" id="q-ar"> Ar-condicionado (+R$30/noite)</label>
+            <label class="admin-check"><input type="checkbox" id="q-hidro"> Hidromassagem (+R$50/noite)</label>
+
+            <div id="campos-individual" style="display:none">
+              <input id="q-camasSolteiro" type="number" min="1" value="1" placeholder="Qtd camas de solteiro*" class="admin-input">
+            </div>
+            <div id="campos-duplo" style="display:none">
+              <select id="q-tipoCama" class="admin-input">
+                <option value="CASAL">Casal (+R$40)</option>
+                <option value="QUEEN">Queen (+R$80)</option>
+                <option value="KING">King (+R$120)</option>
+              </select>
+              <label class="admin-check"><input type="checkbox" id="q-berco"> Berço disponível</label>
+            </div>
+            <div id="campos-familia" style="display:none">
+              <input id="q-camasSolteiroF" type="number" min="0" value="0" placeholder="Camas solteiro" class="admin-input">
+              <input id="q-camasCasal" type="number" min="0" value="0" placeholder="Camas casal" class="admin-input">
+              <input id="q-camasQueenKing" type="number" min="0" value="0" placeholder="Camas Queen/King" class="admin-input">
+              <input id="q-ambientes" type="number" min="1" value="1" placeholder="Qtd de ambientes" class="admin-input">
+            </div>
+            <button onclick="criarQuarto()" class="admin-btn">Cadastrar Quarto</button>
+          </div>
+        </div>
+        <div>
+          <h3 style="margin-bottom:16px;font-weight:700">Quartos cadastrados</h3>
+          <div id="lista-quartos" class="admin-list"><p style="color:#9ca3af">Carregando...</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clientes -->
+    <div id="admin-clientes" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+        <div>
+          <h3 style="margin-bottom:16px;font-weight:700">Cadastrar Cliente</h3>
+          <div class="admin-form">
+            <input id="cli-nome" placeholder="Nome*" class="admin-input">
+            <input id="cli-cpf" placeholder="CPF* (somente números, 11 dígitos)" maxlength="14" class="admin-input">
+            <input id="cli-email" type="email" placeholder="E-mail" class="admin-input">
+            <input id="cli-telefone" placeholder="Telefone" class="admin-input">
+            <button onclick="criarCliente()" class="admin-btn">Cadastrar Cliente</button>
+          </div>
+        </div>
+        <div>
+          <h3 style="margin-bottom:16px;font-weight:700">Clientes cadastrados</h3>
+          <div id="lista-clientes" class="admin-list"><p style="color:#9ca3af">Carregando...</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aluguéis -->
+    <div id="admin-alugueis" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+        <div>
+          <h3 style="margin-bottom:16px;font-weight:700">Criar Aluguel</h3>
+          <div class="admin-form">
+            <select id="al-quartoId" class="admin-input"><option value="">-- Selecione o quarto* --</option></select>
+            <select id="al-clienteId" class="admin-input"><option value="">-- Selecione o cliente* --</option></select>
+            <label style="font-size:13px;color:#6b7280;margin-bottom:-6px">Data de check-in*</label>
+            <input id="al-dataInicio" type="date" class="admin-input">
+            <label style="font-size:13px;color:#6b7280;margin-bottom:-6px">Data de check-out*</label>
+            <input id="al-dataFim" type="date" class="admin-input">
+            <input id="al-hospedes" type="number" min="1" value="1" placeholder="Nº de hóspedes*" class="admin-input">
+            <label class="admin-check"><input type="checkbox" id="al-berco"> Solicitar berço</label>
+            <button onclick="criarAluguel()" class="admin-btn">Confirmar Aluguel</button>
+          </div>
+        </div>
+        <div>
+          <h3 style="margin-bottom:16px;font-weight:700">Aluguéis registrados</h3>
+          <div id="lista-alugueis" class="admin-list"><p style="color:#9ca3af">Carregando...</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="admin-msg" style="margin-top:20px;font-weight:700;font-size:15px;min-height:24px"></div>
   </div>
 </div>
 
@@ -628,10 +757,15 @@
 </footer>
 
 <script>
+const API = 'http://localhost:8080';
+
+// ===== NAVEGAÇÃO =====
 function showPage(page) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById("page-" + page).classList.add("active");
   window.scrollTo({ top: 0, behavior: "smooth" });
+  if (page === 'listings' || page === 'home') carregarQuartosListagem();
+  if (page === 'admin') adminTab('residencias');
 }
 
 document.querySelectorAll(".category-btn").forEach(btn => {
@@ -642,14 +776,203 @@ document.querySelectorAll(".category-btn").forEach(btn => {
 });
 
 const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add("visible");
-    }
-  });
+  entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add("visible"); });
 }, { threshold: 0.15 });
-
 document.querySelectorAll(".fade-in").forEach(el => observer.observe(el));
+
+// ===== LISTAGEM DE QUARTOS =====
+const emojis = ['🏖️','🌲','🌅','🏙️','🏡','🌿','🏔️','🌊'];
+const grads  = ['grad-1','grad-2','grad-3','grad-4','grad-5','grad-6','grad-7','grad-8'];
+
+function tipoLabel(q) {
+  return { INDIVIDUAL:'🛏️ Individual', DUPLO:'💑 Duplo', FAMILIA:'👨‍👩‍👧 Família' }[q.tipo] || q.tipo;
+}
+
+async function carregarQuartosListagem() {
+  try {
+    const quartos = await fetch(`${API}/quartos`).then(r => r.json());
+    renderListings(quartos, 'listings-container');
+    renderListings(quartos.slice(0, 4), 'featured-container');
+  } catch(e) { console.warn('Backend offline:', e); }
+}
+
+function renderListings(quartos, containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (!quartos || quartos.length === 0) {
+    el.innerHTML = '<p style="color:#9ca3af;padding:32px;grid-column:1/-1;text-align:center">Nenhuma acomodação cadastrada ainda.<br>Acesse o painel <strong>⚙️ Admin</strong> para cadastrar residências e quartos.</p>';
+    return;
+  }
+  el.innerHTML = quartos.map((q, i) => `
+    <div class="card" onclick="abrirDetalhe(${q.id})" style="cursor:pointer">
+      <div class="card-img-wrap">
+        <div class="card-img-placeholder ${grads[i%8]}" style="font-size:60px;display:flex;align-items:center;justify-content:center">${emojis[i%8]}</div>
+        <button class="card-fav" onclick="event.stopPropagation()">♡</button>
+      </div>
+      <div class="card-body">
+        <div class="card-location">
+          <span class="card-city">${q.residencia ? q.residencia.cidade+', '+q.residencia.uf : ''}</span>
+          <span class="card-rating">${tipoLabel(q)}</span>
+        </div>
+        <div class="card-name">${q.residencia ? q.residencia.nome : 'Acomodação'}</div>
+        <div class="card-dates">Cap. ${q.capacidadeMaxima} hóspedes${q.possuiAR?' · ❄️ AR':''}${q.possuiHidro?' · 🛁 Hidro':''}</div>
+        <div class="card-price">R$ ${q.valorBase.toFixed(2)} <span>/ noite</span></div>
+      </div>
+    </div>`).join('');
+}
+
+// ===== DETALHE E RESERVA =====
+function abrirDetalhe(quartoId) {
+  fetch(`${API}/quartos/${quartoId}`).then(r => r.json()).then(q => {
+    document.getElementById('detail-nome').textContent = q.residencia ? q.residencia.nome : 'Acomodação';
+    document.getElementById('detail-local').textContent = '📍 ' + (q.residencia ? `${q.residencia.cidade}, ${q.residencia.uf}` : '');
+    document.getElementById('detail-tipo').textContent = tipoLabel(q) + ' · Cap. ' + q.capacidadeMaxima + ' hóspedes';
+    document.getElementById('detail-preco').innerHTML = `R$ ${q.valorBase.toFixed(2)} <span>/ noite</span>`;
+    document.getElementById('al-m-quartoId').value = quartoId;
+    document.getElementById('modal-msg').textContent = '';
+    carregarClientesSelect('al-m-clienteId');
+    showPage('detail');
+  }).catch(() => showPage('detail'));
+}
+
+async function confirmarReservaModal() {
+  const msg = document.getElementById('modal-msg');
+  const payload = {
+    quartoId: parseInt(document.getElementById('al-m-quartoId').value),
+    clienteId: parseInt(document.getElementById('al-m-clienteId').value),
+    dataInicio: document.getElementById('al-m-inicio').value,
+    dataFim: document.getElementById('al-m-fim').value,
+    numHospedes: parseInt(document.getElementById('al-m-hospedes').value),
+    solicitouBerco: document.getElementById('al-m-berco').checked
+  };
+  if (!payload.quartoId || !payload.clienteId || !payload.dataInicio || !payload.dataFim) {
+    msg.textContent = '⚠️ Preencha todos os campos obrigatórios.'; msg.style.color='#ef4444'; return;
+  }
+  try {
+    const r = await fetch(`${API}/alugueis`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+    const d = await r.json();
+    if (r.ok) { msg.textContent = `✅ Reserva confirmada! Total: R$ ${d.valorTotal.toFixed(2)}`; msg.style.color='#16a34a'; }
+    else { msg.textContent = '❌ ' + (d.message || 'Erro ao criar reserva'); msg.style.color='#ef4444'; }
+  } catch(e) { msg.textContent = '❌ Servidor offline.'; msg.style.color='#ef4444'; }
+}
+
+// ===== ADMIN =====
+function adminTab(tab) {
+  ['residencias','quartos','clientes','alugueis'].forEach(t => {
+    document.getElementById('admin-'+t).style.display = t===tab ? '' : 'none';
+    document.getElementById('tab-'+t).classList.toggle('active', t===tab);
+  });
+  if (tab==='residencias') carregarResidencias();
+  if (tab==='quartos') { carregarQuartosAdmin(); carregarResidenciasSelect('q-residenciaId'); }
+  if (tab==='clientes') carregarClientes();
+  if (tab==='alugueis') { carregarAlugueis(); carregarQuartosSelect('al-quartoId'); carregarClientesSelect('al-clienteId'); }
+}
+
+function adminMsg(m, ok) {
+  const el = document.getElementById('admin-msg');
+  el.textContent = m; el.style.color = ok ? '#16a34a' : '#ef4444';
+  setTimeout(() => el.textContent='', 5000);
+}
+
+// --- Residências ---
+async function carregarResidencias() {
+  const res = await fetch(`${API}/residencias`).then(r=>r.json()).catch(()=>[]);
+  document.getElementById('lista-residencias').innerHTML = res.length
+    ? res.map(r=>`<div class="admin-item"><div><strong>${r.nome}</strong><br><small>${r.endereco} – ${r.cidade}/${r.uf}</small></div><button onclick="deletarResidencia(${r.id})" class="admin-del">🗑</button></div>`).join('')
+    : '<p style="color:#9ca3af">Nenhuma residência cadastrada.</p>';
+}
+async function criarResidencia() {
+  const payload = { nome:document.getElementById('res-nome').value, endereco:document.getElementById('res-endereco').value, cidade:document.getElementById('res-cidade').value, uf:document.getElementById('res-uf').value };
+  const r = await fetch(`${API}/residencias`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const d = await r.json();
+  r.ok ? (adminMsg('✅ Residência cadastrada!',true), carregarResidencias(), carregarResidenciasSelect('q-residenciaId')) : adminMsg('❌ '+(d.message||'Erro'),false);
+}
+async function deletarResidencia(id) {
+  if (!confirm('Deletar esta residência e todos os seus quartos?')) return;
+  await fetch(`${API}/residencias/${id}`,{method:'DELETE'});
+  carregarResidencias();
+}
+async function carregarResidenciasSelect(id) {
+  const res = await fetch(`${API}/residencias`).then(r=>r.json()).catch(()=>[]);
+  document.getElementById(id).innerHTML = '<option value="">-- Selecione a residência* --</option>' + res.map(r=>`<option value="${r.id}">${r.nome} (${r.cidade})</option>`).join('');
+}
+
+// --- Quartos ---
+async function carregarQuartosAdmin() {
+  const res = await fetch(`${API}/quartos`).then(r=>r.json()).catch(()=>[]);
+  document.getElementById('lista-quartos').innerHTML = res.length
+    ? res.map(q=>`<div class="admin-item"><div><strong>${q.residencia?q.residencia.nome:'?'}</strong> <span style="background:#e0e7ff;color:#3730a3;border-radius:6px;padding:2px 8px;font-size:12px">${q.tipo}</span><br><small>R$ ${q.valorBase}/noite · Cap. ${q.capacidadeMaxima}${q.possuiAR?' · AR':''}${q.possuiHidro?' · Hidro':''}</small></div><button onclick="deletarQuarto(${q.id})" class="admin-del">🗑</button></div>`).join('')
+    : '<p style="color:#9ca3af">Nenhum quarto cadastrado.</p>';
+}
+async function criarQuarto() {
+  const tipo = document.getElementById('q-tipo').value;
+  if (!tipo) { adminMsg('❌ Selecione o tipo do quarto',false); return; }
+  const payload = { tipo, valorBase:parseFloat(document.getElementById('q-valorBase').value), possuiAR:document.getElementById('q-ar').checked, possuiHidro:document.getElementById('q-hidro').checked, residenciaId:parseInt(document.getElementById('q-residenciaId').value) };
+  if (tipo==='INDIVIDUAL') payload.camasSolteiro = parseInt(document.getElementById('q-camasSolteiro').value)||1;
+  if (tipo==='DUPLO') { payload.tipoCamaCasal=document.getElementById('q-tipoCama').value; payload.possuiBercoDisponivel=document.getElementById('q-berco').checked; }
+  if (tipo==='FAMILIA') { payload.camasSolteiro=parseInt(document.getElementById('q-camasSolteiroF').value)||0; payload.camasCasal=parseInt(document.getElementById('q-camasCasal').value)||0; payload.camasQueenKing=parseInt(document.getElementById('q-camasQueenKing').value)||0; payload.quantidadeAmbientes=parseInt(document.getElementById('q-ambientes').value)||1; }
+  const r = await fetch(`${API}/quartos`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const d = await r.json();
+  r.ok ? (adminMsg('✅ Quarto cadastrado!',true), carregarQuartosAdmin()) : adminMsg('❌ '+(d.message||'Erro'),false);
+}
+function atualizarCamposQuarto() {
+  const tipo = document.getElementById('q-tipo').value;
+  ['individual','duplo','familia'].forEach(t => document.getElementById('campos-'+t).style.display = t===tipo.toLowerCase() ? '' : 'none');
+}
+async function deletarQuarto(id) {
+  if (!confirm('Deletar este quarto?')) return;
+  await fetch(`${API}/quartos/${id}`,{method:'DELETE'});
+  carregarQuartosAdmin();
+}
+async function carregarQuartosSelect(id) {
+  const res = await fetch(`${API}/quartos`).then(r=>r.json()).catch(()=>[]);
+  document.getElementById(id).innerHTML = '<option value="">-- Selecione o quarto* --</option>' + res.map(q=>`<option value="${q.id}">[${q.tipo}] ${q.residencia?q.residencia.nome:'?'} – R$${q.valorBase}</option>`).join('');
+}
+
+// --- Clientes ---
+async function carregarClientes() {
+  const res = await fetch(`${API}/clientes`).then(r=>r.json()).catch(()=>[]);
+  document.getElementById('lista-clientes').innerHTML = res.length
+    ? res.map(c=>`<div class="admin-item"><div><strong>${c.nome}</strong><br><small>CPF: ${c.cpf}${c.email?' · '+c.email:''}</small></div><button onclick="deletarCliente(${c.id})" class="admin-del">🗑</button></div>`).join('')
+    : '<p style="color:#9ca3af">Nenhum cliente cadastrado.</p>';
+}
+async function criarCliente() {
+  const payload = { nome:document.getElementById('cli-nome').value, cpf:document.getElementById('cli-cpf').value, email:document.getElementById('cli-email').value, telefone:document.getElementById('cli-telefone').value };
+  const r = await fetch(`${API}/clientes`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const d = await r.json();
+  r.ok ? (adminMsg('✅ Cliente cadastrado!',true), carregarClientes()) : adminMsg('❌ '+(d.message||'Erro'),false);
+}
+async function deletarCliente(id) {
+  if (!confirm('Deletar este cliente?')) return;
+  await fetch(`${API}/clientes/${id}`,{method:'DELETE'});
+  carregarClientes();
+}
+async function carregarClientesSelect(id) {
+  const res = await fetch(`${API}/clientes`).then(r=>r.json()).catch(()=>[]);
+  document.getElementById(id).innerHTML = '<option value="">-- Selecione o cliente --</option>' + res.map(c=>`<option value="${c.id}">${c.nome} (${c.cpf})</option>`).join('');
+}
+
+// --- Aluguéis ---
+async function carregarAlugueis() {
+  const res = await fetch(`${API}/alugueis`).then(r=>r.json()).catch(()=>[]);
+  document.getElementById('lista-alugueis').innerHTML = res.length
+    ? res.map(a=>`<div class="admin-item"><div><strong>${a.cliente?a.cliente.nome:'?'}</strong><br><small>${a.dataInicio} → ${a.dataFim} · ${a.numHospedes} hósp. · Diária: R$${a.valorDiaria.toFixed(2)} · <strong>Total: R$${a.valorTotal.toFixed(2)}</strong></small></div><button onclick="deletarAluguel(${a.id})" class="admin-del">🗑</button></div>`).join('')
+    : '<p style="color:#9ca3af">Nenhum aluguel registrado.</p>';
+}
+async function criarAluguel() {
+  const payload = { quartoId:parseInt(document.getElementById('al-quartoId').value), clienteId:parseInt(document.getElementById('al-clienteId').value), dataInicio:document.getElementById('al-dataInicio').value, dataFim:document.getElementById('al-dataFim').value, numHospedes:parseInt(document.getElementById('al-hospedes').value), solicitouBerco:document.getElementById('al-berco').checked };
+  const r = await fetch(`${API}/alugueis`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const d = await r.json();
+  r.ok ? (adminMsg(`✅ Aluguel criado! Total: R$ ${d.valorTotal.toFixed(2)}`,true), carregarAlugueis()) : adminMsg('❌ '+(d.message||'Erro'),false);
+}
+async function deletarAluguel(id) {
+  if (!confirm('Deletar este aluguel?')) return;
+  await fetch(`${API}/alugueis/${id}`,{method:'DELETE'});
+  carregarAlugueis();
+}
+
+// Carrega quartos ao abrir o site
+window.addEventListener('DOMContentLoaded', carregarQuartosListagem);
 </script>
 
 </body>
