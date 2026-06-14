@@ -98,7 +98,7 @@ public class AluguelService {
                 "Aluguel ja esta cancelado: " + id);
         }
         if (aluguel.getDataInicio().isBefore(LocalDate.now())) {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
+            throw new DataInvalidaException(
                 "Nao e possivel cancelar um aluguel que ja iniciou");
         }
         aluguel.cancelar();

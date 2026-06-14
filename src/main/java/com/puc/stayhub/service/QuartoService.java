@@ -75,8 +75,7 @@ public class QuartoService {
                 int queenKing = dto.getCamasQueenKing() != null ? dto.getCamasQueenKing() : 0;
                 int ambientes = dto.getQuantidadeAmbientes() != null ? dto.getQuantidadeAmbientes() : 1;
                 if (solteiro + casal + queenKing == 0) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Quarto Familia deve ter ao menos uma cama");
+                    throw new IllegalArgumentException("Quarto Familia deve ter ao menos uma cama");
                 }
                 yield new QuartoFamilia(solteiro, casal, queenKing, ambientes);
             }
