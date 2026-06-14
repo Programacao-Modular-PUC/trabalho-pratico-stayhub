@@ -1,6 +1,6 @@
-# StayHub - Backend (Sprint 2)
+# StayHub - Backend (Sprint 3)
 
-Backend do sistema de hospedagem **StayHub**, desenvolvido para a disciplina de Programação Modular (PUC Minas) na Sprint 2.
+Backend do sistema de hospedagem **StayHub**, desenvolvido para a disciplina de Programação Modular (PUC Minas). A Sprint 3 acrescenta tratamento de exceções personalizadas, testes unitários com JUnit e novos requisitos funcionais (filtro por tipo, cancelamento e histórico de alugueis).
 
 ## Tecnologias
 
@@ -10,27 +10,46 @@ Backend do sistema de hospedagem **StayHub**, desenvolvido para a disciplina de 
 - MySQL 8 (perfil padrão)
 - H2 (perfil opcional, para testes locais sem MySQL)
 - Maven
+- JUnit 5 + Mockito (testes)
 
 ## Arquitetura
 
-O projeto segue uma arquitetura em camadas:
+O projeto segue uma arquitetura em camadas, com separação por pacote:
 
 ```
 controller  →  service  →  repository  →  model (entidades JPA)
+                  │
+                  └──→ exception (exceções personalizadas + handler global)
 ```
 
-A herança entre os tipos de quarto (`Quarto`, `QuartoIndividual`, `QuartoDuplo`, `QuartoFamilia`) é mapeada via estratégia `SINGLE_TABLE` do JPA, usando uma coluna discriminadora `tipo`.
+- **controller** — endpoints REST (`@RestController`)
+- **service** — regras de negócio
+- **repository** — interfaces `JpaRepository`
+- **model** — entidades JPA, enums e a hierarquia polimórfica de `Quarto`
+- **dto** — objetos de transporte de requisições
+- **exception** — exceções customizadas e `GlobalExceptionHandler` (`@RestControllerAdvice`)
+
+A herança entre os tipos de quarto (`Quarto`, `QuartoIndividual`, `QuartoDuplo`, `QuartoFamilia`) é mapeada via estratégia `SINGLE_TABLE` do JPA, usando a coluna discriminadora `tipo`. O cálculo da diária é resolvido por polimorfismo: cada subclasse implementa `calcularDiaria(numHospedes, solicitouBerco)`.
 
 ## Endpoints
 
-| Recurso | Endpoint base |
-|---------|---------------|
-| Residências | `/residencias` |
-| Quartos | `/quartos` |
-| Clientes | `/clientes` |
-| Aluguéis | `/alugueis` |
+### Recursos base
 
-Cada recurso oferece os verbos REST padrão: `GET` (lista e busca por id), `POST` (criação), `PUT` (atualização) e `DELETE` (remoção). O endpoint `GET /quartos/{id}/diaria?hospedes=X&berco=Y` simula o cálculo de diária sem persistir aluguel.
+| Recurso | Endpoint base | Verbos |
+|---------|---------------|--------|
+| Residências | `/residencias` | `GET`, `POST`, `PUT`, `DELETE` |
+| Quartos | `/quartos` | `GET`, `POST`, `DELETE` |
+| Clientes | `/clientes` | `GET`, `POST`, `PUT`, `DELETE` |
+| Aluguéis | `/alugueis` | `GET`, `POST`, `DELETE` |
+
+### Endpoints adicionados na Sprint 3
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| `GET` | `/quartos?tipo=DUPLO` | Filtra quartos pelo tipo (`INDIVIDUAL`, `DUPLO`, `FAMILIA`) |
+| `GET` | `/quartos?residenciaId=1&tipo=FAMILIA` | Filtra por residência **e** tipo |
+| `PATCH` | `/alugueis/{id}/cancelar` | Cancela um aluguel (muda status para `CANCELADO`) |
+| `GET` | `/alugueis/cliente/{id}/historico` | Histórico completo do cliente ordenado por data (inclui cancelados) |
 
 ## Regras de cálculo
 
@@ -50,6 +69,71 @@ Desconto progressivo: 3 hóspedes = 5%, 4–5 = 10%, 6+ = 15%.
 ### Adicionais comuns
 - Ar-condicionado: +R$ 30
 - Hidromassagem: +R$ 50
+
+## Tratamento de Exceções
+
+A Sprint 3 introduz exceções personalizadas no pacote `com.puc.stayhub.exception` e um `GlobalExceptionHandler` centralizado, que padroniza o JSON de erro:
+
+```json
+{
+  "timestamp": "2026-06-14T19:59:14.407582700",
+  "status": 404,
+  "error": "Not Found",
+  "message": "Cliente nao encontrado: 999"
+}
+```
+
+### Mapeamento de exceções → códigos HTTP
+
+| Exceção | Código HTTP | Quando ocorre |
+|---------|-------------|---------------|
+| `QuartoIndisponivelException` | 409 Conflict | Sobreposição de datas com aluguel ativo |
+| `CapacidadeExcedidaException` | 400 Bad Request | `numHospedes` excede a capacidade do quarto |
+| `DataInvalidaException` | 400 Bad Request | Datas nulas, invertidas, no passado |
+| `RecursoNaoPermitidoException` | 422 Unprocessable Entity | Berço em quarto individual / berço indisponível no duplo |
+| `MethodArgumentNotValidException` | 400 Bad Request | Falha de validação `@Valid` |
+| `IllegalArgumentException` | 400 Bad Request | Pré-condição violada (ex.: `numHospedes <= 0`) |
+| `DateTimeParseException` | 400 Bad Request | Formato de data inválido |
+| `NullPointerException` | 500 Internal Server Error | Campo obrigatório ausente |
+| `ResponseStatusException` | Conforme status | 404 (entidade inexistente) / 409 (conflitos de estado) |
+
+## Testes (JUnit 5 + Mockito)
+
+A suíte cobre os 4 pontos exigidos pela Sprint 3:
+
+- **Cálculo de diária** por tipo de quarto (Individual, Duplo, Família)
+- **Regras de berço** (proibido no Individual, opcional no Duplo)
+- **Limites de hóspedes** (capacidade máxima por tipo)
+- **Disponibilidade** (sobreposição de datas no `AluguelService`)
+
+Estrutura dos testes:
+
+```
+src/test/java/com/puc/stayhub/
+├── model/
+│   ├── QuartoIndividualTest.java   (6 testes)
+│   ├── QuartoDuploTest.java        (5 testes)
+│   ├── QuartoFamiliaTest.java      (7 testes)
+│   └── AluguelTest.java            (5 testes)
+└── service/
+    └── AluguelServiceTest.java     (8 testes — usa Mockito)
+```
+
+**Total: 31 testes, todos verdes.**
+
+### Rodar os testes
+
+```bash
+mvn test
+```
+
+### Gerar o relatório HTML do JUnit
+
+```bash
+mvn surefire-report:report
+```
+
+Relatório formatado em `target/reports/surefire.html`. Logs `.txt` e `.xml` em `target/surefire-reports/`. Para a entrega, imprima o HTML como PDF (`Ctrl+P`).
 
 ## Como executar
 
@@ -143,11 +227,36 @@ Content-Type: application/json
 }
 ```
 
+### Cancelar Aluguel (Sprint 3)
+
+```http
+PATCH /alugueis/5/cancelar
+```
+
+### Histórico do cliente (Sprint 3)
+
+```http
+GET /alugueis/cliente/1/historico
+```
+
+Retorna todos os aluguéis do cliente (ativos, concluídos e cancelados) ordenados por `dataInicio` decrescente.
+
+### Filtrar quartos por tipo (Sprint 3)
+
+```http
+GET /quartos?tipo=DUPLO
+GET /quartos?residenciaId=1&tipo=FAMILIA
+```
+
+## Diagrama de classes
+
+Disponível em `Docs/diagrama-classes.md` (Mermaid) e `Docs/diagrama-classes.puml` (PlantUML).
+
 ## Integrantes
 
-- Cauã Thomarco Thomaz Teixeira
-- Guilherme Augusto da Silva Machado
-- Sofia Figueiredo de Oliveira
+- Cauã Thomarco Thomaz Teixeira — Sprint 3: Testes unitários JUnit
+- Guilherme Augusto da Silva Machado — Sprint 3: Filtro por tipo, cancelamento e histórico
+- Sofia Figueiredo de Oliveira — Sprint 3: Exceções personalizadas e tratamento global
 
 ## Professor
 
