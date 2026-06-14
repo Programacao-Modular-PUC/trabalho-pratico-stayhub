@@ -4,7 +4,11 @@ C:\Users\cauat\IdeaProjects\trabalho-pratico-stayhub\src\main\java\com\puc\stayh
 C:\Users\cauat\IdeaProjects\trabalho-pratico-stayhub\src\main\java\com\puc\stayhub\controller\ResidenciaController.java
 C:\Users\cauat\IdeaProjects\trabalho-pratico-stayhub\src\main\java\com\puc\stayhub\dto\AluguelRequestDTO.java
 C:\Users\cauat\IdeaProjects\trabalho-pratico-stayhub\src\main\java\com\puc\stayhub\dto\QuartoRequestDTO.java
+C:\Users\cauat\IdeaProjects\trabalho-pratico-stayhub\src\main\java\com\puc\stayhub\exception\CapacidadeExcedidaException.java
+C:\Users\cauat\IdeaProjects\trabalho-pratico-stayhub\src\main\java\com\puc\stayhub\exception\DataInvalidaException.java
 C:\Users\cauat\IdeaProjects\trabalho-pratico-stayhub\src\main\java\com\puc\stayhub\exception\GlobalExceptionHandler.java
+C:\Users\cauat\IdeaProjects\trabalho-pratico-stayhub\src\main\java\com\puc\stayhub\exception\QuartoIndisponivelException.java
+C:\Users\cauat\IdeaProjects\trabalho-pratico-stayhub\src\main\java\com\puc\stayhub\exception\RecursoNaoPermitidoException.java
 C:\Users\cauat\IdeaProjects\trabalho-pratico-stayhub\src\main\java\com\puc\stayhub\model\Aluguel.java
 C:\Users\cauat\IdeaProjects\trabalho-pratico-stayhub\src\main\java\com\puc\stayhub\model\Cliente.java
 C:\Users\cauat\IdeaProjects\trabalho-pratico-stayhub\src\main\java\com\puc\stayhub\model\Quarto.java
@@ -12,6 +16,7 @@ C:\Users\cauat\IdeaProjects\trabalho-pratico-stayhub\src\main\java\com\puc\stayh
 C:\Users\cauat\IdeaProjects\trabalho-pratico-stayhub\src\main\java\com\puc\stayhub\model\QuartoFamilia.java
 C:\Users\cauat\IdeaProjects\trabalho-pratico-stayhub\src\main\java\com\puc\stayhub\model\QuartoIndividual.java
 C:\Users\cauat\IdeaProjects\trabalho-pratico-stayhub\src\main\java\com\puc\stayhub\model\Residencia.java
+C:\Users\cauat\IdeaProjects\trabalho-pratico-stayhub\src\main\java\com\puc\stayhub\model\StatusAluguel.java
 C:\Users\cauat\IdeaProjects\trabalho-pratico-stayhub\src\main\java\com\puc\stayhub\model\TipoCamaCasal.java
 C:\Users\cauat\IdeaProjects\trabalho-pratico-stayhub\src\main\java\com\puc\stayhub\model\TipoQuarto.java
 C:\Users\cauat\IdeaProjects\trabalho-pratico-stayhub\src\main\java\com\puc\stayhub\repository\AluguelRepository.java

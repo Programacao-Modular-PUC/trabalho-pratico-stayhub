@@ -70,7 +70,7 @@ import java.util.Map;
                                  "Erro interno: campo obrigatorio nao informado. Detalhe: " + ex.getMessage());    
         }    
         
-        @ExceptionHandler(Exception.class)    ]
+        @ExceptionHandler(Exception.class)
         public ResponseEntity<Map<String, Object>> handleGenerico(Exception ex) {        
             return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR,            "Erro inesperado: " + ex.getMessage());   
         }    

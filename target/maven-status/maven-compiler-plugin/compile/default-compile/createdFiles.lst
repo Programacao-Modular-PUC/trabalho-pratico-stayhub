@@ -1,0 +1,5 @@
+com\puc\stayhub\exception\CapacidadeExcedidaException.class
+com\puc\stayhub\exception\RecursoNaoPermitidoException.class
+com\puc\stayhub\exception\QuartoIndisponivelException.class
+com\puc\stayhub\exception\DataInvalidaException.class
+com\puc\stayhub\model\StatusAluguel.class

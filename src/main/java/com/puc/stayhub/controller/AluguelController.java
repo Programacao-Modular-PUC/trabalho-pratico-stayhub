@@ -1,3 +1,5 @@
+package com.puc.stayhub.controller;
+
 import com.puc.stayhub.dto.AluguelRequestDTO;
 import com.puc.stayhub.model.Aluguel;
 import com.puc.stayhub.service.AluguelService;
