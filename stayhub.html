@@ -584,6 +584,8 @@
       <button onclick="adminTab('quartos')" id="tab-quartos" class="admin-tab">🛏️ Quartos</button>
       <button onclick="adminTab('clientes')" id="tab-clientes" class="admin-tab">👤 Clientes</button>
       <button onclick="adminTab('alugueis')" id="tab-alugueis" class="admin-tab">📋 Aluguéis</button>
+      <button onclick="adminTab('tarifas')" id="tab-tarifas" class="admin-tab">🎫 Tarifas</button>
+      <button onclick="adminTab('notificacoes')" id="tab-notificacoes" class="admin-tab">🔔 Notificações</button>
     </div>
 
     <!-- Residencias -->
@@ -646,7 +648,15 @@
           </div>
         </div>
         <div>
-          <h3 style="margin-bottom:16px;font-weight:700">Quartos cadastrados</h3>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:8px">
+            <h3 style="font-weight:700;margin:0">Quartos cadastrados</h3>
+            <select id="q-filtro-tipo" onchange="carregarQuartosAdmin()" class="admin-input" style="max-width:190px;margin:0">
+              <option value="">Todos os tipos</option>
+              <option value="INDIVIDUAL">Individual</option>
+              <option value="DUPLO">Duplo</option>
+              <option value="FAMILIA">Família</option>
+            </select>
+          </div>
           <div id="lista-quartos" class="admin-list"><p style="color:#9ca3af">Carregando...</p></div>
         </div>
       </div>
@@ -692,6 +702,93 @@
         <div>
           <h3 style="margin-bottom:16px;font-weight:700">Aluguéis registrados</h3>
           <div id="lista-alugueis" class="admin-list"><p style="color:#9ca3af">Carregando...</p></div>
+        </div>
+      </div>
+
+      <div style="margin-top:32px;padding-top:24px;border-top:1px solid #e5e7eb">
+        <h3 style="margin-bottom:16px;font-weight:700">📜 Histórico de reservas por cliente (Sprint 3)</h3>
+        <div style="display:grid;grid-template-columns:1fr 2fr;gap:24px">
+          <div class="admin-form">
+            <select id="h-clienteId" class="admin-input"><option value="">-- Selecione o cliente --</option></select>
+            <button onclick="buscarHistoricoCliente()" class="admin-btn">Buscar histórico</button>
+          </div>
+          <div>
+            <div id="lista-historico" class="admin-list"><p style="color:#9ca3af">Selecione um cliente para ver o histórico.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         TARIFAS (Sprint 4 - Tarifacao Flexivel)
+         ========================================================= -->
+    <div id="admin-tarifas" style="display:none">
+      <p style="color:#6b7280;margin-bottom:24px">Configuração dinâmica de feriados, promoções e simulação de tarifa usando os padrões <strong>Strategy</strong> + <strong>Decorator</strong> + <strong>Singleton</strong> (<code>GerenciadorTarifas</code>).</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:32px">
+        <div>
+          <h3 style="margin-bottom:16px;font-weight:700">🎄 Cadastrar Feriado</h3>
+          <div class="admin-form">
+            <label style="font-size:13px;color:#6b7280;margin-bottom:-6px">Data do feriado</label>
+            <input id="tar-feriado-data" type="date" class="admin-input">
+            <button onclick="adicionarFeriado()" class="admin-btn">Adicionar feriado (+20% diária)</button>
+          </div>
+        </div>
+        <div>
+          <h3 style="margin-bottom:16px;font-weight:700">Feriados ativos</h3>
+          <div id="lista-feriados" class="admin-list"><p style="color:#9ca3af">Carregando...</p></div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:32px">
+        <div>
+          <h3 style="margin-bottom:16px;font-weight:700">💸 Cadastrar Promoção</h3>
+          <div class="admin-form">
+            <input id="tar-promo-nome" placeholder="Nome da promoção*" class="admin-input">
+            <input id="tar-promo-perc" type="number" step="0.01" min="0" max="1" placeholder="Percentual de desconto (0.30 = 30%)" class="admin-input">
+            <label style="font-size:13px;color:#6b7280;margin-bottom:-6px">Início</label>
+            <input id="tar-promo-inicio" type="date" class="admin-input">
+            <label style="font-size:13px;color:#6b7280;margin-bottom:-6px">Fim</label>
+            <input id="tar-promo-fim" type="date" class="admin-input">
+            <button onclick="adicionarPromocao()" class="admin-btn">Adicionar promoção</button>
+          </div>
+        </div>
+        <div>
+          <h3 style="margin-bottom:16px;font-weight:700">🧮 Simular tarifa</h3>
+          <div class="admin-form">
+            <input id="tar-sim-valor" type="number" step="0.01" placeholder="Valor base R$/noite" class="admin-input">
+            <label style="font-size:13px;color:#6b7280;margin-bottom:-6px">Data de início</label>
+            <input id="tar-sim-inicio" type="date" class="admin-input">
+            <label style="font-size:13px;color:#6b7280;margin-bottom:-6px">Data de fim</label>
+            <input id="tar-sim-fim" type="date" class="admin-input">
+            <input id="tar-sim-reservas" type="number" min="0" value="0" placeholder="Nº de reservas anteriores do cliente" class="admin-input">
+            <button onclick="simularTarifa()" class="admin-btn">Simular valor final</button>
+            <div id="tar-sim-resultado" style="margin-top:12px;padding:12px;background:#f0f9ff;border-radius:8px;display:none"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         NOTIFICAÇÕES (Sprint 4 - Central de Notificacoes + LogService)
+         ========================================================= -->
+    <div id="admin-notificacoes" style="display:none">
+      <p style="color:#6b7280;margin-bottom:24px">Rastreio dos eventos publicados pela <strong>CentralNotificacoes</strong> (Observer + Strategy + Singleton) e das entradas do <strong>LogService</strong> (Singleton). Ambos são preenchidos automaticamente cada vez que um aluguel é criado ou cancelado.</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <h3 style="font-weight:700;margin:0">📣 Histórico de eventos publicados</h3>
+            <button onclick="carregarHistoricoNotif()" class="admin-btn" style="max-width:120px;margin:0;padding:8px 12px">Recarregar</button>
+          </div>
+          <div id="lista-historico-notif" class="admin-list"><p style="color:#9ca3af">Carregando...</p></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <h3 style="font-weight:700;margin:0">📋 Log da aplicação</h3>
+            <button onclick="carregarLogs()" class="admin-btn" style="max-width:120px;margin:0;padding:8px 12px">Recarregar</button>
+          </div>
+          <div id="lista-logs" class="admin-list"><p style="color:#9ca3af">Carregando...</p></div>
         </div>
       </div>
     </div>
@@ -858,14 +955,16 @@ async function confirmarReservaModal() {
 
 // ===== ADMIN =====
 function adminTab(tab) {
-  ['residencias','quartos','clientes','alugueis'].forEach(t => {
+  ['residencias','quartos','clientes','alugueis','tarifas','notificacoes'].forEach(t => {
     document.getElementById('admin-'+t).style.display = t===tab ? '' : 'none';
     document.getElementById('tab-'+t).classList.toggle('active', t===tab);
   });
   if (tab==='residencias') carregarResidencias();
   if (tab==='quartos') { carregarQuartosAdmin(); carregarResidenciasSelect('q-residenciaId'); }
   if (tab==='clientes') carregarClientes();
-  if (tab==='alugueis') { carregarAlugueis(); carregarQuartosSelect('al-quartoId'); carregarClientesSelect('al-clienteId'); }
+  if (tab==='alugueis') { carregarAlugueis(); carregarQuartosSelect('al-quartoId'); carregarClientesSelect('al-clienteId'); carregarClientesSelect('h-clienteId'); }
+  if (tab==='tarifas') carregarFeriados();
+  if (tab==='notificacoes') { carregarHistoricoNotif(); carregarLogs(); }
 }
 
 function adminMsg(m, ok) {
@@ -899,10 +998,12 @@ async function carregarResidenciasSelect(id) {
 
 // --- Quartos ---
 async function carregarQuartosAdmin() {
-  const res = await fetch(`${API}/quartos`).then(r=>r.json()).catch(()=>[]);
+  const filtro = document.getElementById('q-filtro-tipo')?.value || '';
+  const url = filtro ? `${API}/quartos?tipo=${filtro}` : `${API}/quartos`;
+  const res = await fetch(url).then(r=>r.json()).catch(()=>[]);
   document.getElementById('lista-quartos').innerHTML = res.length
     ? res.map(q=>`<div class="admin-item"><div><strong>${q.residencia?q.residencia.nome:'?'}</strong> <span style="background:#e0e7ff;color:#3730a3;border-radius:6px;padding:2px 8px;font-size:12px">${q.tipo}</span><br><small>R$ ${q.valorBase}/noite · Cap. ${q.capacidadeMaxima}${q.possuiAR?' · AR':''}${q.possuiHidro?' · Hidro':''}</small></div><button onclick="deletarQuarto(${q.id})" class="admin-del">🗑</button></div>`).join('')
-    : '<p style="color:#9ca3af">Nenhum quarto cadastrado.</p>';
+    : '<p style="color:#9ca3af">Nenhum quarto encontrado com esse filtro.</p>';
 }
 async function criarQuarto() {
   const tipo = document.getElementById('q-tipo').value;
@@ -953,11 +1054,35 @@ async function carregarClientesSelect(id) {
 }
 
 // --- Aluguéis ---
+function renderAluguelItem(a) {
+  const badge = a.status === 'CANCELADO'
+    ? '<span style="background:#fee2e2;color:#991b1b;border-radius:6px;padding:2px 8px;font-size:12px;margin-left:6px">CANCELADO</span>'
+    : '<span style="background:#dcfce7;color:#166534;border-radius:6px;padding:2px 8px;font-size:12px;margin-left:6px">ATIVO</span>';
+  const btnCancelar = a.status === 'ATIVO'
+    ? `<button onclick="cancelarAluguel(${a.id})" class="admin-del" style="background:#f59e0b;color:#fff;border-color:#f59e0b" title="Cancelar aluguel">🚫</button>`
+    : '';
+  return `<div class="admin-item"><div><strong>#${a.id} · ${a.cliente?a.cliente.nome:'?'}</strong>${badge}<br><small>${a.dataInicio} → ${a.dataFim} · ${a.numHospedes} hósp. · Diária: R$${a.valorDiaria.toFixed(2)} · <strong>Total: R$${a.valorTotal.toFixed(2)}</strong></small></div><div style="display:flex;gap:4px">${btnCancelar}<button onclick="deletarAluguel(${a.id})" class="admin-del">🗑</button></div></div>`;
+}
 async function carregarAlugueis() {
   const res = await fetch(`${API}/alugueis`).then(r=>r.json()).catch(()=>[]);
   document.getElementById('lista-alugueis').innerHTML = res.length
-    ? res.map(a=>`<div class="admin-item"><div><strong>${a.cliente?a.cliente.nome:'?'}</strong><br><small>${a.dataInicio} → ${a.dataFim} · ${a.numHospedes} hósp. · Diária: R$${a.valorDiaria.toFixed(2)} · <strong>Total: R$${a.valorTotal.toFixed(2)}</strong></small></div><button onclick="deletarAluguel(${a.id})" class="admin-del">🗑</button></div>`).join('')
+    ? res.map(renderAluguelItem).join('')
     : '<p style="color:#9ca3af">Nenhum aluguel registrado.</p>';
+}
+async function cancelarAluguel(id) {
+  if (!confirm('Cancelar o aluguel #'+id+'? A CentralNotificacoes vai publicar um evento RESERVA_CANCELADA.')) return;
+  const r = await fetch(`${API}/alugueis/${id}/cancelar`, { method:'PATCH' });
+  const d = await r.json().catch(()=>({}));
+  if (r.ok) { adminMsg('🚫 Aluguel cancelado! Evento publicado na CentralNotificacoes.', true); carregarAlugueis(); }
+  else adminMsg('❌ '+(d.message||'Erro ao cancelar'), false);
+}
+async function buscarHistoricoCliente() {
+  const cid = document.getElementById('h-clienteId').value;
+  if (!cid) { adminMsg('❌ Selecione um cliente', false); return; }
+  const res = await fetch(`${API}/alugueis/cliente/${cid}/historico`).then(r=>r.json()).catch(()=>[]);
+  document.getElementById('lista-historico').innerHTML = res.length
+    ? '<p style="color:#6b7280;margin-bottom:12px;font-size:14px">Total: <strong>'+res.length+'</strong> reservas (ordenadas por data ↓)</p>' + res.map(renderAluguelItem).join('')
+    : '<p style="color:#9ca3af">Este cliente não possui histórico de reservas.</p>';
 }
 async function criarAluguel() {
   const payload = { quartoId:parseInt(document.getElementById('al-quartoId').value), clienteId:parseInt(document.getElementById('al-clienteId').value), dataInicio:document.getElementById('al-dataInicio').value, dataFim:document.getElementById('al-dataFim').value, numHospedes:parseInt(document.getElementById('al-hospedes').value), solicitouBerco:document.getElementById('al-berco').checked };
@@ -969,6 +1094,87 @@ async function deletarAluguel(id) {
   if (!confirm('Deletar este aluguel?')) return;
   await fetch(`${API}/alugueis/${id}`,{method:'DELETE'});
   carregarAlugueis();
+}
+
+// =========================================================
+// TARIFAS (Sprint 4 - Strategy + Decorator + Singleton)
+// =========================================================
+async function carregarFeriados() {
+  const res = await fetch(`${API}/tarifas/feriados`).then(r=>r.json()).catch(()=>[]);
+  const arr = Array.isArray(res) ? res : [];
+  document.getElementById('lista-feriados').innerHTML = arr.length
+    ? arr.sort().map(d => `<div class="admin-item"><div><strong>📅 ${d}</strong><br><small>Aplica +20% na diária</small></div><button onclick="removerFeriado('${d}')" class="admin-del">🗑</button></div>`).join('')
+    : '<p style="color:#9ca3af">Nenhum feriado cadastrado.</p>';
+}
+async function adicionarFeriado() {
+  const data = document.getElementById('tar-feriado-data').value;
+  if (!data) { adminMsg('❌ Informe a data do feriado', false); return; }
+  const r = await fetch(`${API}/tarifas/feriados`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ data }) });
+  if (r.ok) { adminMsg('🎄 Feriado adicionado!', true); document.getElementById('tar-feriado-data').value=''; carregarFeriados(); }
+  else adminMsg('❌ Erro ao adicionar feriado', false);
+}
+async function removerFeriado(data) {
+  if (!confirm('Remover feriado '+data+'?')) return;
+  await fetch(`${API}/tarifas/feriados`, { method:'DELETE', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ data }) });
+  carregarFeriados();
+}
+async function adicionarPromocao() {
+  const nome = document.getElementById('tar-promo-nome').value;
+  const percentual = parseFloat(document.getElementById('tar-promo-perc').value);
+  const inicio = document.getElementById('tar-promo-inicio').value;
+  const fim = document.getElementById('tar-promo-fim').value;
+  if (!nome || isNaN(percentual) || !inicio || !fim) { adminMsg('❌ Preencha todos os campos da promoção', false); return; }
+  const r = await fetch(`${API}/tarifas/promocoes`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ nome, percentual, inicio, fim }) });
+  const d = await r.json().catch(()=>({}));
+  if (r.ok) {
+    adminMsg(`💸 Promoção '${nome}' (${(percentual*100).toFixed(0)}%) adicionada!`, true);
+    ['tar-promo-nome','tar-promo-perc','tar-promo-inicio','tar-promo-fim'].forEach(id => document.getElementById(id).value='');
+  } else adminMsg('❌ '+(d.message||'Erro'), false);
+}
+async function simularTarifa() {
+  const valorBase = parseFloat(document.getElementById('tar-sim-valor').value);
+  const dataInicio = document.getElementById('tar-sim-inicio').value;
+  const dataFim = document.getElementById('tar-sim-fim').value;
+  const qtdReservasCliente = parseInt(document.getElementById('tar-sim-reservas').value) || 0;
+  if (isNaN(valorBase) || !dataInicio || !dataFim) { adminMsg('❌ Preencha valor e datas', false); return; }
+  const r = await fetch(`${API}/tarifas/simular`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ valorBase, dataInicio, dataFim, qtdReservasCliente }) });
+  const d = await r.json().catch(()=>({}));
+  const box = document.getElementById('tar-sim-resultado');
+  if (r.ok) {
+    const diff = d.valorFinal - d.valorBase;
+    const sinal = diff >= 0 ? '+' : '';
+    box.style.display = 'block';
+    box.innerHTML = `<div style="font-size:16px"><strong>Base:</strong> R$ ${d.valorBase.toFixed(2)}<br><strong>Final:</strong> R$ ${d.valorFinal.toFixed(2)} <span style="color:${diff>=0?'#dc2626':'#16a34a'}">(${sinal}R$ ${Math.abs(diff).toFixed(2)})</span></div><div style="margin-top:8px;font-size:13px;color:#6b7280"><strong>Regras aplicadas:</strong> ${d.regrasAplicadas}</div>`;
+  } else adminMsg('❌ '+(d.message||'Erro na simulação'), false);
+}
+
+// =========================================================
+// NOTIFICAÇÕES (Sprint 4 - Observer + LogService Singleton)
+// =========================================================
+async function carregarHistoricoNotif() {
+  const res = await fetch(`${API}/notificacoes/historico`).then(r=>r.json()).catch(()=>[]);
+  const arr = Array.isArray(res) ? res : [];
+  document.getElementById('lista-historico-notif').innerHTML = arr.length
+    ? arr.slice().reverse().map(e => {
+        const cor = e.tipo === 'RESERVA_CRIADA' ? '#dcfce7' : e.tipo === 'RESERVA_CANCELADA' ? '#fee2e2' : '#e0e7ff';
+        const corTexto = e.tipo === 'RESERVA_CRIADA' ? '#166534' : e.tipo === 'RESERVA_CANCELADA' ? '#991b1b' : '#3730a3';
+        const ts = e.timestamp ? new Date(e.timestamp).toLocaleString('pt-BR') : '';
+        const clienteNome = e.aluguel && e.aluguel.cliente ? e.aluguel.cliente.nome : '';
+        return `<div class="admin-item"><div><span style="background:${cor};color:${corTexto};border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700">${e.tipo}</span><br><small>${ts} · ${clienteNome ? 'Cliente: '+clienteNome : ''} · ${e.descricao || ''}</small></div></div>`;
+      }).join('')
+    : '<p style="color:#9ca3af">Nenhum evento publicado ainda. Crie ou cancele uma reserva para gerar eventos.</p>';
+}
+async function carregarLogs() {
+  const res = await fetch(`${API}/notificacoes/logs`).then(r=>r.json()).catch(()=>[]);
+  const arr = Array.isArray(res) ? res : [];
+  document.getElementById('lista-logs').innerHTML = arr.length
+    ? arr.slice().reverse().map(l => {
+        const cor = l.nivel === 'ERROR' ? '#fee2e2' : l.nivel === 'WARN' ? '#fef3c7' : '#e0f2fe';
+        const corTexto = l.nivel === 'ERROR' ? '#991b1b' : l.nivel === 'WARN' ? '#92400e' : '#075985';
+        const ts = l.timestamp ? new Date(l.timestamp).toLocaleString('pt-BR') : '';
+        return `<div class="admin-item"><div><span style="background:${cor};color:${corTexto};border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700">${l.nivel}</span> <small style="color:#6b7280">${l.origem}</small><br><small>${ts} · ${l.mensagem}</small></div></div>`;
+      }).join('')
+    : '<p style="color:#9ca3af">Nenhum log registrado ainda.</p>';
 }
 
 // Carrega quartos ao abrir o site

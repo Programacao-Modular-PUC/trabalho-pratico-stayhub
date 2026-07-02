@@ -28,6 +28,7 @@ com\puc\stayhub\tarifa\RegraTarifaDecorator.class
 com\puc\stayhub\notificacao\CentralNotificacoes.class
 com\puc\stayhub\tarifa\AltaTemporada.class
 com\puc\stayhub\exception\QuartoIndisponivelException.class
+com\puc\stayhub\config\H2CompatDialect.class
 com\puc\stayhub\notificacao\CanalEmail.class
 com\puc\stayhub\tarifa\Feriado.class
 com\puc\stayhub\controller\TarifaController$SimulacaoRequest.class

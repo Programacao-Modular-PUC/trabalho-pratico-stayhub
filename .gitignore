@@ -1,3 +1,5 @@
 node_modules/
 .idea/
 relatorio-final/
+package.json
+package-lock.json
