@@ -4,6 +4,7 @@ import com.puc.stayhub.log.LogService;
 import com.puc.stayhub.notificacao.CentralNotificacoes;
 import com.puc.stayhub.notificacao.EventoReserva;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +17,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/notificacoes")
+@CrossOrigin(origins = "*")
 public class NotificacaoController {
 
     @GetMapping("/historico")

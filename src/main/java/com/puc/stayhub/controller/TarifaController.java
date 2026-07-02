@@ -17,6 +17,7 @@ import java.util.Set;
  */
 @RestController
 @RequestMapping("/tarifas")
+@CrossOrigin(origins = "*")
 public class TarifaController {
 
     public static class FeriadoRequest {
