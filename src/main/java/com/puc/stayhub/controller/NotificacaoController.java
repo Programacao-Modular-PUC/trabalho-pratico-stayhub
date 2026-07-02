@@ -2,7 +2,6 @@ package com.puc.stayhub.controller;
 
 import com.puc.stayhub.log.LogService;
 import com.puc.stayhub.notificacao.CentralNotificacoes;
-import com.puc.stayhub.notificacao.EventoReserva;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +12,8 @@ import java.util.List;
 
 /**
  * Endpoints de leitura do historico da CentralNotificacoes e do LogService.
- * Ambos delegam aos respectivos Singletons.
+ * Ambos delegam aos respectivos Singletons e sao persistidos em disco
+ * (data/events.jsonl e data/logs.jsonl), portanto sobrevivem a reinicios.
  */
 @RestController
 @RequestMapping("/notificacoes")
@@ -21,7 +21,7 @@ import java.util.List;
 public class NotificacaoController {
 
     @GetMapping("/historico")
-    public ResponseEntity<List<EventoReserva>> historico() {
+    public ResponseEntity<List<CentralNotificacoes.EventoSnapshot>> historico() {
         return ResponseEntity.ok(CentralNotificacoes.getInstancia().getHistoricoEventos());
     }
 

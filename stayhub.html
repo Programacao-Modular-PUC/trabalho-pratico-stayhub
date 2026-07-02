@@ -595,10 +595,17 @@
         <div>
           <h3 style="margin-bottom:16px;font-weight:700">Cadastrar Residência</h3>
           <div class="admin-form">
-            <input id="res-nome" placeholder="Nome*" class="admin-input">
-            <input id="res-endereco" placeholder="Endereço*" class="admin-input">
-            <input id="res-cidade" placeholder="Cidade" class="admin-input">
-            <input id="res-uf" placeholder="UF (ex: SP)" maxlength="2" class="admin-input">
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Nome da residência*</label>
+            <input id="res-nome" placeholder="Ex: Casa Ipanema, Chalé Serra Verde" class="admin-input">
+
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Endereço completo*</label>
+            <input id="res-endereco" placeholder="Ex: Av. Vieira Souto, 320" class="admin-input">
+
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Cidade</label>
+            <input id="res-cidade" placeholder="Ex: Rio de Janeiro" class="admin-input">
+
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">UF (sigla do estado)</label>
+            <input id="res-uf" placeholder="Ex: RJ" maxlength="2" class="admin-input">
             <button onclick="criarResidencia()" class="admin-btn">Cadastrar Residência</button>
           </div>
         </div>
@@ -615,35 +622,55 @@
         <div>
           <h3 style="margin-bottom:16px;font-weight:700">Cadastrar Quarto</h3>
           <div class="admin-form">
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Tipo do quarto*</label>
             <select id="q-tipo" class="admin-input" onchange="atualizarCamposQuarto()">
-              <option value="">-- Tipo do quarto* --</option>
+              <option value="">-- Selecione o tipo do quarto --</option>
               <option value="INDIVIDUAL">Individual (camas solteiro)</option>
               <option value="DUPLO">Duplo / Casal</option>
               <option value="FAMILIA">Família</option>
             </select>
-            <input id="q-valorBase" type="number" placeholder="Valor base R$/noite*" class="admin-input">
+
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Valor da diária base (R$ por noite)*</label>
+            <input id="q-valorBase" type="number" step="0.01" min="0" placeholder="Ex: 250.00" class="admin-input">
+
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Residência a que o quarto pertence*</label>
             <select id="q-residenciaId" class="admin-input">
-              <option value="">-- Selecione a residência* --</option>
+              <option value="">-- Selecione a residência --</option>
             </select>
-            <label class="admin-check"><input type="checkbox" id="q-ar"> Ar-condicionado (+R$30/noite)</label>
-            <label class="admin-check"><input type="checkbox" id="q-hidro"> Hidromassagem (+R$50/noite)</label>
+
+            <div style="font-size:13px;color:#374151;font-weight:600;margin-top:4px">Adicionais opcionais:</div>
+            <label class="admin-check"><input type="checkbox" id="q-ar"> ❄️ Ar-condicionado (+R$ 30 na diária)</label>
+            <label class="admin-check"><input type="checkbox" id="q-hidro"> 💧 Hidromassagem (+R$ 50 na diária)</label>
 
             <div id="campos-individual" style="display:none">
-              <input id="q-camasSolteiro" type="number" min="1" value="1" placeholder="Qtd camas de solteiro*" class="admin-input">
+              <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Quantidade de camas de solteiro*</label>
+              <input id="q-camasSolteiro" type="number" min="1" value="1" placeholder="Ex: 2" class="admin-input">
+              <small style="color:#6b7280">Cada cama extra adiciona R$ 25 à diária. Capacidade máxima = número de camas.</small>
             </div>
+
             <div id="campos-duplo" style="display:none">
+              <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Tipo da cama de casal*</label>
               <select id="q-tipoCama" class="admin-input">
-                <option value="CASAL">Casal (+R$40)</option>
-                <option value="QUEEN">Queen (+R$80)</option>
-                <option value="KING">King (+R$120)</option>
+                <option value="CASAL">Casal padrão (+R$ 40)</option>
+                <option value="QUEEN">Queen (+R$ 80)</option>
+                <option value="KING">King (+R$ 120)</option>
               </select>
-              <label class="admin-check"><input type="checkbox" id="q-berco"> Berço disponível</label>
+              <label class="admin-check"><input type="checkbox" id="q-berco"> 🍼 Este quarto oferece berço para bebê (+R$ 35 se o cliente solicitar)</label>
             </div>
+
             <div id="campos-familia" style="display:none">
-              <input id="q-camasSolteiroF" type="number" min="0" value="0" placeholder="Camas solteiro" class="admin-input">
-              <input id="q-camasCasal" type="number" min="0" value="0" placeholder="Camas casal" class="admin-input">
-              <input id="q-camasQueenKing" type="number" min="0" value="0" placeholder="Camas Queen/King" class="admin-input">
-              <input id="q-ambientes" type="number" min="1" value="1" placeholder="Qtd de ambientes" class="admin-input">
+              <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Quantidade de camas de solteiro no quarto</label>
+              <input id="q-camasSolteiroF" type="number" min="0" value="0" placeholder="Ex: 2" class="admin-input">
+
+              <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Quantidade de camas de casal padrão</label>
+              <input id="q-camasCasal" type="number" min="0" value="0" placeholder="Ex: 1" class="admin-input">
+
+              <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Quantidade de camas Queen/King</label>
+              <input id="q-camasQueenKing" type="number" min="0" value="0" placeholder="Ex: 1" class="admin-input">
+
+              <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Quantidade de ambientes internos*</label>
+              <input id="q-ambientes" type="number" min="1" value="1" placeholder="Ex: 2 (quarto + sala)" class="admin-input">
+              <small style="color:#6b7280">Ex: 2 = quarto e sala de estar; 3 = quarto, sala e home-office.</small>
             </div>
             <button onclick="criarQuarto()" class="admin-btn">Cadastrar Quarto</button>
           </div>
@@ -669,10 +696,17 @@
         <div>
           <h3 style="margin-bottom:16px;font-weight:700">Cadastrar Cliente</h3>
           <div class="admin-form">
-            <input id="cli-nome" placeholder="Nome*" class="admin-input">
-            <input id="cli-cpf" placeholder="CPF* (somente números, 11 dígitos)" maxlength="14" class="admin-input">
-            <input id="cli-email" type="email" placeholder="E-mail" class="admin-input">
-            <input id="cli-telefone" placeholder="Telefone" class="admin-input">
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Nome completo do cliente*</label>
+            <input id="cli-nome" placeholder="Ex: João Silva" class="admin-input">
+
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">CPF (11 dígitos, somente números)*</label>
+            <input id="cli-cpf" placeholder="Ex: 12345678900" maxlength="14" class="admin-input">
+
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">E-mail para contato</label>
+            <input id="cli-email" type="email" placeholder="Ex: joao@email.com" class="admin-input">
+
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Telefone com DDD</label>
+            <input id="cli-telefone" placeholder="Ex: 31999998888" class="admin-input">
             <button onclick="criarCliente()" class="admin-btn">Cadastrar Cliente</button>
           </div>
         </div>
@@ -689,14 +723,22 @@
         <div>
           <h3 style="margin-bottom:16px;font-weight:700">Criar Aluguel</h3>
           <div class="admin-form">
-            <select id="al-quartoId" class="admin-input"><option value="">-- Selecione o quarto* --</option></select>
-            <select id="al-clienteId" class="admin-input"><option value="">-- Selecione o cliente* --</option></select>
-            <label style="font-size:13px;color:#6b7280;margin-bottom:-6px">Data de check-in*</label>
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Quarto a ser reservado*</label>
+            <select id="al-quartoId" class="admin-input"><option value="">-- Selecione o quarto --</option></select>
+
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Cliente titular da reserva*</label>
+            <select id="al-clienteId" class="admin-input"><option value="">-- Selecione o cliente --</option></select>
+
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Data de check-in (entrada)*</label>
             <input id="al-dataInicio" type="date" class="admin-input">
-            <label style="font-size:13px;color:#6b7280;margin-bottom:-6px">Data de check-out*</label>
+
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Data de check-out (saída)*</label>
             <input id="al-dataFim" type="date" class="admin-input">
-            <input id="al-hospedes" type="number" min="1" value="1" placeholder="Nº de hóspedes*" class="admin-input">
-            <label class="admin-check"><input type="checkbox" id="al-berco"> Solicitar berço</label>
+
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Quantidade de hóspedes que se hospedarão*</label>
+            <input id="al-hospedes" type="number" min="1" value="1" placeholder="Ex: 2" class="admin-input">
+
+            <label class="admin-check"><input type="checkbox" id="al-berco"> 🍼 Cliente solicita berço para bebê</label>
             <button onclick="criarAluguel()" class="admin-btn">Confirmar Aluguel</button>
           </div>
         </div>
@@ -843,7 +885,7 @@
             <input id="hp-email" type="email" placeholder="Ex: maria@email.com" class="admin-input">
             <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Telefone com DDD</label>
             <input id="hp-telefone" placeholder="Ex: 31999998888" class="admin-input">
-            <button onclick="hospedeCadastrar()" class="admin-btn" style="background:#ec4899">Criar minha conta e entrar</button>
+            <button onclick="hospedeCadastrar()" class="admin-btn" style="background:#ec4899;color:#fff">Criar minha conta e entrar</button>
           </div>
         </div>
 
@@ -884,7 +926,7 @@
             <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Número de hóspedes</label>
             <input id="hp-hospedes" type="number" min="1" value="1" class="admin-input">
             <label class="admin-check"><input type="checkbox" id="hp-berco"> 🍼 Precisamos de berço para bebê</label>
-            <button onclick="hospedeReservar()" class="admin-btn" style="background:#ec4899">Confirmar reserva</button>
+            <button onclick="hospedeReservar()" class="admin-btn" style="background:#ec4899;color:#fff">Confirmar reserva</button>
           </div>
         </div>
 

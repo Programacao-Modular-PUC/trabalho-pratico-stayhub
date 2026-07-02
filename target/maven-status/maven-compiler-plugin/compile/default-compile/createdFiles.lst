@@ -10,6 +10,7 @@ com\puc\stayhub\tarifa\PromocaoTemporaria.class
 com\puc\stayhub\notificacao\CanalWhatsApp.class
 com\puc\stayhub\config\NotificacaoConfig.class
 com\puc\stayhub\log\LogService$Entrada.class
+com\puc\stayhub\notificacao\CentralNotificacoes$EventoSnapshot.class
 com\puc\stayhub\exception\DataInvalidaException.class
 com\puc\stayhub\tarifa\RegraTarifa.class
 com\puc\stayhub\tarifa\ContextoTarifacao.class
@@ -29,6 +30,8 @@ com\puc\stayhub\tarifa\RegraTarifaDecorator.class
 com\puc\stayhub\notificacao\CentralNotificacoes.class
 com\puc\stayhub\tarifa\AltaTemporada.class
 com\puc\stayhub\exception\QuartoIndisponivelException.class
+com\puc\stayhub\notificacao\CentralNotificacoes$AluguelSnapshot.class
+com\puc\stayhub\notificacao\CentralNotificacoes$ClienteSnapshot.class
 com\puc\stayhub\config\H2CompatDialect.class
 com\puc\stayhub\notificacao\CanalEmail.class
 com\puc\stayhub\tarifa\Feriado.class

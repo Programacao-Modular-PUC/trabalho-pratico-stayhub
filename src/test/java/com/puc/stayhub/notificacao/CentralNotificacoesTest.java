@@ -73,10 +73,10 @@ class CentralNotificacoesTest {
         central.publicar(new EventoReserva(
             TipoEventoReserva.RESERVA_CANCELADA, new Aluguel(), "b"));
 
-        List<EventoReserva> historico = central.getHistoricoEventos();
+        List<CentralNotificacoes.EventoSnapshot> historico = central.getHistoricoEventos();
         assertEquals(2, historico.size());
-        assertEquals(TipoEventoReserva.RESERVA_CRIADA, historico.get(0).getTipo());
-        assertEquals(TipoEventoReserva.RESERVA_CANCELADA, historico.get(1).getTipo());
+        assertEquals(TipoEventoReserva.RESERVA_CRIADA, historico.get(0).tipo);
+        assertEquals(TipoEventoReserva.RESERVA_CANCELADA, historico.get(1).tipo);
     }
 
     @Test
