@@ -1,5 +1,12 @@
 com\puc\stayhub\model\QuartoFamiliaTest.class
-com\puc\stayhub\service\AluguelServiceTest.class
+com\puc\stayhub\notificacao\CentralNotificacoesTest$3.class
 com\puc\stayhub\model\QuartoIndividualTest.class
-com\puc\stayhub\model\QuartoDuploTest.class
 com\puc\stayhub\model\AluguelTest.class
+com\puc\stayhub\notificacao\CentralNotificacoesTest$5.class
+com\puc\stayhub\notificacao\CentralNotificacoesTest$2.class
+com\puc\stayhub\notificacao\CentralNotificacoesTest$1.class
+com\puc\stayhub\notificacao\CentralNotificacoesTest$4.class
+com\puc\stayhub\service\AluguelServiceTest.class
+com\puc\stayhub\tarifa\GerenciadorTarifasTest.class
+com\puc\stayhub\model\QuartoDuploTest.class
+com\puc\stayhub\notificacao\CentralNotificacoesTest.class

@@ -4,13 +4,19 @@ import com.puc.stayhub.dto.AluguelRequestDTO;
 import com.puc.stayhub.exception.DataInvalidaException;
 import com.puc.stayhub.exception.QuartoIndisponivelException;
 import com.puc.stayhub.exception.CapacidadeExcedidaException;
+import com.puc.stayhub.log.LogService;
 import com.puc.stayhub.model.Aluguel;
 import com.puc.stayhub.model.Cliente;
 import com.puc.stayhub.model.Quarto;
 import com.puc.stayhub.model.StatusAluguel;
+import com.puc.stayhub.notificacao.CentralNotificacoes;
+import com.puc.stayhub.notificacao.EventoReserva;
+import com.puc.stayhub.notificacao.TipoEventoReserva;
 import com.puc.stayhub.repository.AluguelRepository;
 import com.puc.stayhub.repository.ClienteRepository;
 import com.puc.stayhub.repository.QuartoRepository;
+import com.puc.stayhub.tarifa.ContextoTarifacao;
+import com.puc.stayhub.tarifa.GerenciadorTarifas;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -88,7 +94,26 @@ public class AluguelService {
         aluguel.setStatus(StatusAluguel.ATIVO);
         aluguel.recalcularValores();
 
-        return aluguelRepository.save(aluguel);
+        double valorBase = aluguel.getValorDiaria();
+        int qtdReservasAnteriores = aluguelRepository.findByClienteId(cliente.getId()).size();
+        ContextoTarifacao ctx = new ContextoTarifacao(
+            valorBase, dto.getDataInicio(), dto.getDataFim(),
+            cliente, qtdReservasAnteriores);
+        double valorAjustado = GerenciadorTarifas.getInstancia().calcular(ctx);
+        aluguel.setValorDiaria(valorAjustado);
+        aluguel.setValorTotal(valorAjustado * aluguel.calcularQuantidadeDiarias());
+
+        Aluguel salvo = aluguelRepository.save(aluguel);
+
+        LogService.getInstancia().info("AluguelService",
+            String.format("Reserva #%d criada para cliente #%d (valor diaria=%.2f, total=%.2f)",
+                salvo.getId(), cliente.getId(), valorAjustado, salvo.getValorTotal()));
+
+        CentralNotificacoes.getInstancia().publicar(new EventoReserva(
+            TipoEventoReserva.RESERVA_CRIADA, salvo,
+            "Sua reserva foi criada com sucesso."));
+
+        return salvo;
     }
 
     public Aluguel cancelar(Long id) {
@@ -102,7 +127,16 @@ public class AluguelService {
                 "Nao e possivel cancelar um aluguel que ja iniciou");
         }
         aluguel.cancelar();
-        return aluguelRepository.save(aluguel);
+        Aluguel salvo = aluguelRepository.save(aluguel);
+
+        LogService.getInstancia().info("AluguelService",
+            String.format("Reserva #%d cancelada", salvo.getId()));
+
+        CentralNotificacoes.getInstancia().publicar(new EventoReserva(
+            TipoEventoReserva.RESERVA_CANCELADA, salvo,
+            "Sua reserva foi cancelada."));
+
+        return salvo;
     }
 
     public void delete(Long id) {
