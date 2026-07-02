@@ -1,263 +1,189 @@
-# StayHub - Backend (Sprint 3)
+# StayHub — Sistema de Hospedagem
 
-Backend do sistema de hospedagem **StayHub**, desenvolvido para a disciplina de Programação Modular (PUC Minas). A Sprint 3 acrescenta tratamento de exceções personalizadas, testes unitários com JUnit e novos requisitos funcionais (filtro por tipo, cancelamento e histórico de alugueis).
+Trabalho prático da disciplina de **Programação Modular** (PUC Minas — Bacharelado em Engenharia de Software, Professor Glender Brás). O sistema simula uma plataforma de hospedagem no estilo Airbnb/Booking, cobrindo modelagem de domínio, API REST, persistência, testes, tratamento de exceções e padrões de projeto (Sprints 1 a 4).
+
+Este README documenta o estado **final** do projeto após a Sprint 4.
 
 ## Tecnologias
 
+**Backend**
 - Java 17
 - Spring Boot 3.3
-- Spring Data JPA
-- MySQL 8 (perfil padrão)
-- H2 (perfil opcional, para testes locais sem MySQL)
+- Spring Data JPA + Hibernate
+- PostgreSQL 15 (perfil padrão) · MySQL 8 (perfil `dev`) · H2 (perfil `h2`, em memória)
 - Maven
-- JUnit 5 + Mockito (testes)
+- JUnit 5 + Mockito
 
-## Arquitetura
+**Frontend**
+- HTML5 / CSS3 / JavaScript nativo (sem framework)
+- Servido via `http-server` (Node.js) na porta 3000
 
-O projeto segue uma arquitetura em camadas, com separação por pacote:
+## Como rodar tudo
 
-```
-controller  →  service  →  repository  →  model (entidades JPA)
-                  │
-                  └──→ exception (exceções personalizadas + handler global)
-```
+Você precisa de **dois terminais** abertos em paralelo.
 
-- **controller** — endpoints REST (`@RestController`)
-- **service** — regras de negócio
-- **repository** — interfaces `JpaRepository`
-- **model** — entidades JPA, enums e a hierarquia polimórfica de `Quarto`
-- **dto** — objetos de transporte de requisições
-- **exception** — exceções customizadas e `GlobalExceptionHandler` (`@RestControllerAdvice`)
-
-A herança entre os tipos de quarto (`Quarto`, `QuartoIndividual`, `QuartoDuplo`, `QuartoFamilia`) é mapeada via estratégia `SINGLE_TABLE` do JPA, usando a coluna discriminadora `tipo`. O cálculo da diária é resolvido por polimorfismo: cada subclasse implementa `calcularDiaria(numHospedes, solicitouBerco)`.
-
-## Endpoints
-
-### Recursos base
-
-| Recurso | Endpoint base | Verbos |
-|---------|---------------|--------|
-| Residências | `/residencias` | `GET`, `POST`, `PUT`, `DELETE` |
-| Quartos | `/quartos` | `GET`, `POST`, `DELETE` |
-| Clientes | `/clientes` | `GET`, `POST`, `PUT`, `DELETE` |
-| Aluguéis | `/alugueis` | `GET`, `POST`, `DELETE` |
-
-### Endpoints adicionados na Sprint 3
-
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| `GET` | `/quartos?tipo=DUPLO` | Filtra quartos pelo tipo (`INDIVIDUAL`, `DUPLO`, `FAMILIA`) |
-| `GET` | `/quartos?residenciaId=1&tipo=FAMILIA` | Filtra por residência **e** tipo |
-| `PATCH` | `/alugueis/{id}/cancelar` | Cancela um aluguel (muda status para `CANCELADO`) |
-| `GET` | `/alugueis/cliente/{id}/historico` | Histórico completo do cliente ordenado por data (inclui cancelados) |
-
-## Regras de cálculo
-
-### Quarto Individual
-`diária = valorBase + (camasSolteiro - 1) × 25,00 + adicionais`
-
-### Quarto Duplo
-`diária = valorBase + adicionalCamaCasal + (berço ? 35,00 : 0) + adicionais`
-
-Adicional de conforto: `CASAL = 40`, `QUEEN = 80`, `KING = 120`.
-
-### Quarto Família
-`diária = valorBase × (1 + 0,08 × numHospedes) × (1 - descontoGrupo) + adicionais`
-
-Desconto progressivo: 3 hóspedes = 5%, 4–5 = 10%, 6+ = 15%.
-
-### Adicionais comuns
-- Ar-condicionado: +R$ 30
-- Hidromassagem: +R$ 50
-
-## Tratamento de Exceções
-
-A Sprint 3 introduz exceções personalizadas no pacote `com.puc.stayhub.exception` e um `GlobalExceptionHandler` centralizado, que padroniza o JSON de erro:
-
-```json
-{
-  "timestamp": "2026-06-14T19:59:14.407582700",
-  "status": 404,
-  "error": "Not Found",
-  "message": "Cliente nao encontrado: 999"
-}
-```
-
-### Mapeamento de exceções → códigos HTTP
-
-| Exceção | Código HTTP | Quando ocorre |
-|---------|-------------|---------------|
-| `QuartoIndisponivelException` | 409 Conflict | Sobreposição de datas com aluguel ativo |
-| `CapacidadeExcedidaException` | 400 Bad Request | `numHospedes` excede a capacidade do quarto |
-| `DataInvalidaException` | 400 Bad Request | Datas nulas, invertidas, no passado |
-| `RecursoNaoPermitidoException` | 422 Unprocessable Entity | Berço em quarto individual / berço indisponível no duplo |
-| `MethodArgumentNotValidException` | 400 Bad Request | Falha de validação `@Valid` |
-| `IllegalArgumentException` | 400 Bad Request | Pré-condição violada (ex.: `numHospedes <= 0`) |
-| `DateTimeParseException` | 400 Bad Request | Formato de data inválido |
-| `NullPointerException` | 500 Internal Server Error | Campo obrigatório ausente |
-| `ResponseStatusException` | Conforme status | 404 (entidade inexistente) / 409 (conflitos de estado) |
-
-## Testes (JUnit 5 + Mockito)
-
-A suíte cobre os 4 pontos exigidos pela Sprint 3:
-
-- **Cálculo de diária** por tipo de quarto (Individual, Duplo, Família)
-- **Regras de berço** (proibido no Individual, opcional no Duplo)
-- **Limites de hóspedes** (capacidade máxima por tipo)
-- **Disponibilidade** (sobreposição de datas no `AluguelService`)
-
-Estrutura dos testes:
-
-```
-src/test/java/com/puc/stayhub/
-├── model/
-│   ├── QuartoIndividualTest.java   (6 testes)
-│   ├── QuartoDuploTest.java        (5 testes)
-│   ├── QuartoFamiliaTest.java      (7 testes)
-│   └── AluguelTest.java            (5 testes)
-└── service/
-    └── AluguelServiceTest.java     (8 testes — usa Mockito)
-```
-
-**Total: 31 testes, todos verdes.**
-
-### Rodar os testes
-
-```bash
-mvn test
-```
-
-### Gerar o relatório HTML do JUnit
-
-```bash
-mvn surefire-report:report
-```
-
-Relatório formatado em `target/reports/surefire.html`. Logs `.txt` e `.xml` em `target/surefire-reports/`. Para a entrega, imprima o HTML como PDF (`Ctrl+P`).
-
-## Como executar
-
-### 1. Com MySQL (perfil padrão)
-
-Tendo MySQL rodando em `localhost:3306` com usuário `root` / senha `root`:
-
-```bash
-mvn spring-boot:run
-```
-
-O banco `stayhub` será criado automaticamente.
-
-### 2. Com MySQL + dados de teste (perfil `dev`)
-
-```bash
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
-```
-
-Cria o banco `stayhub_dev` do zero e popula com residências, quartos e clientes de exemplo.
-
-### 3. Sem MySQL (perfil `h2`, em memória)
+### Terminal 1 — Backend (H2 em memória, recomendado para demonstração)
 
 ```bash
 mvn spring-boot:run -Dspring-boot.run.profiles=h2
 ```
 
-Console H2 disponível em `http://localhost:8080/h2-console`.
+Sobe em `http://localhost:8080`. Console H2 disponível em `http://localhost:8080/h2-console` (JDBC URL `jdbc:h2:mem:stayhub`, usuário `sa`, sem senha).
 
-## Exemplos de requisição
+Para usar PostgreSQL (perfil padrão) basta rodar `mvn spring-boot:run` (requer Postgres em `localhost:5432` com usuário `postgres` / senha `1011`).
 
-### Criar Quarto Individual
+### Terminal 2 — Frontend
 
-```http
-POST /quartos
-Content-Type: application/json
-
-{
-  "tipo": "INDIVIDUAL",
-  "residenciaId": 1,
-  "valorBase": 150.00,
-  "possuiAR": true,
-  "possuiHidro": false,
-  "camasSolteiro": 2
-}
+```bash
+npm install   # apenas na primeira vez
+npm run dev
 ```
 
-### Criar Quarto Duplo
+Abre automaticamente `http://localhost:3000/stayhub.html`. O admin panel fica em ⚙️ **Admin** no canto superior direito.
 
-```json
-{
-  "tipo": "DUPLO",
-  "residenciaId": 1,
-  "valorBase": 250.00,
-  "possuiAR": true,
-  "possuiHidro": true,
-  "tipoCamaCasal": "QUEEN",
-  "possuiBercoDisponivel": true
-}
+## Arquitetura em camadas
+
+```
+controller  →  service  →  repository  →  model (entidades JPA)
+                 │
+                 ├─→ exception    (excecoes personalizadas + handler global)  [Sprint 3]
+                 ├─→ notificacao  (Observer + Strategy + Singleton)           [Sprint 4]
+                 ├─→ tarifa       (Strategy + Decorator + Singleton)          [Sprint 4]
+                 ├─→ log          (Singleton)                                 [Sprint 4]
+                 └─→ config       (bootstrap de observadores, dialect H2)    [Sprint 4]
 ```
 
-### Criar Quarto Família
+- **controller** — endpoints REST (`@RestController`)
+- **service** — regras de negócio
+- **repository** — interfaces `JpaRepository`
+- **model** — entidades JPA e a hierarquia polimórfica de `Quarto`
+- **dto** — objetos de transporte de requisições
 
-```json
-{
-  "tipo": "FAMILIA",
-  "residenciaId": 2,
-  "valorBase": 400.00,
-  "possuiAR": true,
-  "possuiHidro": false,
-  "camasSolteiro": 2,
-  "camasCasal": 1,
-  "camasQueenKing": 0,
-  "quantidadeAmbientes": 2
-}
+A herança entre os tipos de quarto (`Quarto`, `QuartoIndividual`, `QuartoDuplo`, `QuartoFamilia`) é mapeada via `SINGLE_TABLE` do JPA com a coluna discriminadora `tipo`. O cálculo da diária base é resolvido por polimorfismo em cada subclasse.
+
+## Funcionalidades por Sprint
+
+### Sprint 1 — Modelagem OO e interface web
+- Entidades `Residencia`, `Quarto` (abstrata + 3 especializações), `Cliente` e `Aluguel`
+- Cartões CRC em `Docs/`
+- Landing page do StayHub (`stayhub.html`)
+
+### Sprint 2 — API REST e persistência JPA
+- CRUD de `Residencia`, `Quarto`, `Cliente` e `Aluguel`
+- Perfis Spring: `default` (PostgreSQL), `dev` (MySQL com dados de exemplo), `h2` (em memória)
+
+### Sprint 3 — Robustez e testes
+- Exceções personalizadas + `GlobalExceptionHandler` (`@RestControllerAdvice`)
+- Filtro de quartos por tipo (`GET /quartos?tipo=DUPLO`)
+- Cancelamento de aluguel (`PATCH /alugueis/{id}/cancelar`)
+- Histórico do cliente (`GET /alugueis/cliente/{id}/historico`)
+- **31 testes** JUnit 5 + Mockito
+
+### Sprint 4 — Padrões de projeto (GoF)
+Duas funcionalidades das seis opções do enunciado, mais o Singleton obrigatório:
+
+| Funcionalidade | Padrões aplicados | Novos endpoints REST |
+|---|---|---|
+| **Central de Notificações** (Opção 3) | Observer + Strategy + Singleton | `GET /notificacoes/historico`, `GET /notificacoes/logs` |
+| **Tarifação Flexível** (Opção 1) | Strategy + Decorator + Singleton | `POST /tarifas/feriados`, `POST /tarifas/promocoes`, `POST /tarifas/simular` |
+| **Singleton em recurso global** (obrigatório) | Singleton | — |
+
+Os **três Singletons** aplicados: `CentralNotificacoes`, `GerenciadorTarifas` e `LogService` — cada um justificado por representar um recurso genuinamente global. Detalhes completos e justificativa das escolhas no relatório em `relatorio-final/relatorio_final.pdf`.
+
+- **13 testes** adicionais (`CentralNotificacoesTest` + `GerenciadorTarifasTest`)
+- Integração no `AluguelService.criar()`: calcula via `GerenciadorTarifas`, registra no `LogService` e publica `EventoReserva` na `CentralNotificacoes`
+
+**Total: 44 testes, todos verdes.**
+
+## Endpoints REST — visão consolidada
+
+### CRUD base (Sprints 1-2)
+
+| Recurso | Endpoint | Verbos |
+|---|---|---|
+| Residências | `/residencias` | GET, POST, PUT, DELETE |
+| Quartos | `/quartos` | GET, POST, DELETE |
+| Clientes | `/clientes` | GET, POST, PUT, DELETE |
+| Aluguéis | `/alugueis` | GET, POST, DELETE |
+
+### Sprint 3
+
+| Método | Endpoint | Descrição |
+|---|---|---|
+| `GET` | `/quartos?tipo=DUPLO` | Filtra quartos por tipo |
+| `GET` | `/quartos?residenciaId=1&tipo=FAMILIA` | Filtra por residência e tipo |
+| `PATCH` | `/alugueis/{id}/cancelar` | Cancela um aluguel (status → CANCELADO) |
+| `GET` | `/alugueis/cliente/{id}/historico` | Histórico completo do cliente |
+
+### Sprint 4
+
+| Método | Endpoint | Descrição |
+|---|---|---|
+| `POST` | `/tarifas/feriados` | Cadastra feriado (aplica +20% em diárias nessa data) |
+| `DELETE` | `/tarifas/feriados` | Remove feriado |
+| `GET` | `/tarifas/feriados` | Lista feriados ativos |
+| `POST` | `/tarifas/promocoes` | Cadastra promoção temporária (`nome`, `percentual`, `inicio`, `fim`) |
+| `POST` | `/tarifas/simular` | Simula valor final da diária dada a cadeia de regras ativas |
+| `GET` | `/notificacoes/historico` | Retorna todos os `EventoReserva` publicados |
+| `GET` | `/notificacoes/logs` | Retorna todas as entradas do `LogService` |
+
+## Frontend — admin panel
+
+O frontend expõe **todas** as funcionalidades do backend em `http://localhost:3000/stayhub.html` → botão ⚙️ **Admin**. São 6 tabs:
+
+- 🏠 **Residências** — CRUD
+- 🛏️ **Quartos** — CRUD + filtro por tipo (Sprint 3)
+- 👤 **Clientes** — CRUD
+- 📋 **Aluguéis** — CRUD, cancelamento com badge de status, busca de histórico por cliente (Sprint 3)
+- 🎫 **Tarifas** — cadastro de feriados/promoções e simulação com detalhamento da cadeia de decoradores (Sprint 4)
+- 🔔 **Notificações** — histórico de eventos publicados pela CentralNotificacoes e log da aplicação (Sprint 4)
+
+## Regras de cálculo da diária base (por tipo de quarto)
+
+```
+Individual: valorBase + (camasSolteiro - 1) × 25 + adicionais
+Duplo:      valorBase + adicionalCamaCasal + (berço ? 35 : 0) + adicionais
+Família:    valorBase × (1 + 0,08 × numHospedes) × (1 - descontoGrupo) + adicionais
 ```
 
-### Criar Aluguel
+- Adicionais comuns: AR +R$ 30, hidromassagem +R$ 50
+- Adicional de cama do duplo: CASAL = 40, QUEEN = 80, KING = 120
+- Desconto de grupo (família): 3 hóspedes = 5%, 4-5 = 10%, 6+ = 15%
 
-```http
-POST /alugueis
-Content-Type: application/json
+A partir da Sprint 4 esse valor base é passado por uma **cadeia dinâmica de decoradores** (`AltaTemporada`, `BaixaTemporada`, `Feriado`, `PromocaoTemporaria`, `DescontoClienteFrequente`) montada pelo `GerenciadorTarifas`.
 
-{
-  "clienteId": 1,
-  "quartoId": 3,
-  "dataInicio": "2026-06-10",
-  "dataFim": "2026-06-15",
-  "numHospedes": 2,
-  "solicitouBerco": true
-}
+## Testes
+
+Executa a suíte completa:
+
+```bash
+mvn test
 ```
 
-### Cancelar Aluguel (Sprint 3)
+Distribuição:
 
-```http
-PATCH /alugueis/5/cancelar
-```
+- `QuartoIndividualTest` — 6
+- `QuartoDuploTest` — 5
+- `QuartoFamiliaTest` — 7
+- `AluguelTest` — 5
+- `AluguelServiceTest` — 8
+- `CentralNotificacoesTest` — 6 (Sprint 4)
+- `GerenciadorTarifasTest` — 7 (Sprint 4)
 
-### Histórico do cliente (Sprint 3)
+**Total: 44 testes.**
 
-```http
-GET /alugueis/cliente/1/historico
-```
+## Documentação
 
-Retorna todos os aluguéis do cliente (ativos, concluídos e cancelados) ordenados por `dataInicio` decrescente.
-
-### Filtrar quartos por tipo (Sprint 3)
-
-```http
-GET /quartos?tipo=DUPLO
-GET /quartos?residenciaId=1&tipo=FAMILIA
-```
-
-## Diagrama de classes
-
-Disponível em `Docs/diagrama-classes.md` (Mermaid) e `Docs/diagrama-classes.puml` (PlantUML).
+- **Relatório final:** `relatorio-final/relatorio_final.pdf` (fonte LaTeX em `relatorio_final.tex` para Overleaf; gerador Python em `gerar_pdf_relatorio.py`)
+- **Diagrama UML:** `relatorio-final/diagrama_final.puml` (renderizar em <https://www.plantuml.com/plantuml/uml>)
+- **Cartões CRC:** `Docs/Cartões CRC.docx`
 
 ## Integrantes
 
-- Cauã Thomarco Thomaz Teixeira — Sprint 3: Testes unitários JUnit
-- Guilherme Augusto da Silva Machado — Sprint 3: Filtro por tipo, cancelamento e histórico
-- Sofia Figueiredo de Oliveira — Sprint 3: Exceções personalizadas e tratamento global
+- **Cauã Thomarco Thomaz Teixeira** — Sprint 3: testes unitários JUnit; Sprint 4: integração no `AluguelService`, diagrama UML e relatório final
+- **Guilherme Augusto da Silva Machado** — Sprint 3: filtro por tipo, cancelamento e histórico; Sprint 4: Tarifação Flexível (Strategy + Decorator + Singleton `GerenciadorTarifas`) e endpoints `/tarifas`
+- **Sofia Figueiredo de Oliveira** — Sprint 3: exceções personalizadas e tratamento global; Sprint 4: Central de Notificações (Observer + Strategy + Singleton `CentralNotificacoes`), `LogService`, endpoints `/notificacoes`
 
 ## Professor
 
-- Glender Brás
+Glender Brás
