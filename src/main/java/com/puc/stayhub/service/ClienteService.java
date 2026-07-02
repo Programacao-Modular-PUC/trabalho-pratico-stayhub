@@ -27,6 +27,12 @@ public class ClienteService {
                 "Cliente nao encontrado: " + id));
     }
 
+    public Cliente findByCpf(String cpf) {
+        return clienteRepository.findByCpf(cpf)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                "Cliente nao encontrado com CPF: " + cpf));
+    }
+
     public Cliente save(Cliente cliente) {
         if (clienteRepository.existsByCpf(cliente.getCpf())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,

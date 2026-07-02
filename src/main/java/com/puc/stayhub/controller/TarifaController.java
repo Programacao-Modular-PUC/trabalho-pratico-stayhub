@@ -80,4 +80,29 @@ public class TarifaController {
         resp.put("regrasAplicadas", descricao);
         return ResponseEntity.ok(resp);
     }
+
+    public static class RegrasSazonaisRequest {
+        public Boolean altaTemporada;
+        public Boolean baixaTemporada;
+        public Boolean descontoClienteFrequente;
+    }
+
+    @GetMapping("/regras-sazonais")
+    public ResponseEntity<Map<String, Object>> lerRegrasSazonais() {
+        GerenciadorTarifas g = GerenciadorTarifas.getInstancia();
+        Map<String, Object> resp = new LinkedHashMap<>();
+        resp.put("altaTemporada", g.isAltaTemporadaAtiva());
+        resp.put("baixaTemporada", g.isBaixaTemporadaAtiva());
+        resp.put("descontoClienteFrequente", g.isDescontoFrequenteAtivo());
+        return ResponseEntity.ok(resp);
+    }
+
+    @PutMapping("/regras-sazonais")
+    public ResponseEntity<Map<String, Object>> atualizarRegrasSazonais(@RequestBody RegrasSazonaisRequest req) {
+        GerenciadorTarifas g = GerenciadorTarifas.getInstancia();
+        if (req.altaTemporada != null)             g.setAltaTemporadaAtiva(req.altaTemporada);
+        if (req.baixaTemporada != null)            g.setBaixaTemporadaAtiva(req.baixaTemporada);
+        if (req.descontoClienteFrequente != null)  g.setDescontoFrequenteAtivo(req.descontoClienteFrequente);
+        return lerRegrasSazonais();
+    }
 }

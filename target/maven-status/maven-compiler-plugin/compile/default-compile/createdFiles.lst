@@ -4,6 +4,7 @@ com\puc\stayhub\notificacao\ObservadorReserva.class
 com\puc\stayhub\notificacao\CanalSMS.class
 com\puc\stayhub\notificacao\NotificadorCliente.class
 com\puc\stayhub\controller\TarifaController$FeriadoRequest.class
+com\puc\stayhub\controller\TarifaController$RegrasSazonaisRequest.class
 com\puc\stayhub\notificacao\EventoReserva.class
 com\puc\stayhub\tarifa\PromocaoTemporaria.class
 com\puc\stayhub\notificacao\CanalWhatsApp.class

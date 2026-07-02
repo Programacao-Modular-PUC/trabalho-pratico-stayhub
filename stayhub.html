@@ -29,11 +29,12 @@
       </button>
     </div>
     <div class="nav-actions">
+      <button class="nav-btn nav-btn-ghost" onclick="showPage('hospede')" style="background:#ec4899;color:#fff" id="btn-hospede">👤 Sou hóspede</button>
       <button class="nav-btn nav-btn-ghost" onclick="showPage('admin')" style="background:var(--dark-blue);color:#fff">⚙️ Admin</button>
       <button class="nav-btn nav-btn-ghost">Anuncie seu espaço</button>
       <div class="nav-user">
         <span class="nav-user-icon">☰</span>
-        <div class="nav-user-avatar">U</div>
+        <div class="nav-user-avatar" id="nav-user-avatar">U</div>
       </div>
     </div>
   </div>
@@ -723,7 +724,27 @@
          TARIFAS (Sprint 4 - Tarifacao Flexivel)
          ========================================================= -->
     <div id="admin-tarifas" style="display:none">
-      <p style="color:#6b7280;margin-bottom:24px">Configuração dinâmica de feriados, promoções e simulação de tarifa usando os padrões <strong>Strategy</strong> + <strong>Decorator</strong> + <strong>Singleton</strong> (<code>GerenciadorTarifas</code>).</p>
+      <p style="color:#6b7280;margin-bottom:24px">Configuração dinâmica de feriados, promoções e simulação de tarifa usando os padrões <strong>Strategy</strong> + <strong>Decorator</strong> + <strong>Singleton</strong> (<code>GerenciadorTarifas</code>). Por padrão, o preço da diária respeita o valor cadastrado no quarto; regras sazonais só são aplicadas quando ativadas abaixo.</p>
+
+      <!-- Regras sazonais opt-in -->
+      <div style="background:#f9fafb;padding:20px;border-radius:12px;border:1px solid #e5e7eb;margin-bottom:32px">
+        <h3 style="margin-bottom:12px;font-weight:700">📊 Regras sazonais (opt-in)</h3>
+        <p style="color:#6b7280;font-size:13px;margin-bottom:16px">Ative apenas o que quiser aplicar em todas as reservas do sistema.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+          <label class="admin-check" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #e5e7eb">
+            <input type="checkbox" id="rs-alta" onchange="atualizarRegrasSazonais()">
+            <strong>Alta temporada</strong><br><small style="color:#6b7280">+35% em Dez/Jan/Jul</small>
+          </label>
+          <label class="admin-check" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #e5e7eb">
+            <input type="checkbox" id="rs-baixa" onchange="atualizarRegrasSazonais()">
+            <strong>Baixa temporada</strong><br><small style="color:#6b7280">-15% em Mar/Abr/Mai/Ago</small>
+          </label>
+          <label class="admin-check" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #e5e7eb">
+            <input type="checkbox" id="rs-desc" onchange="atualizarRegrasSazonais()">
+            <strong>Desconto cliente frequente</strong><br><small style="color:#6b7280">3+ reservas: 5%/10%/15%</small>
+          </label>
+        </div>
+      </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:32px">
         <div>
@@ -797,6 +818,92 @@
   </div>
 </div>
 
+<!-- =========================================================
+     PORTAL DO HOSPEDE (auto-cadastro + minhas reservas)
+     ========================================================= -->
+<div id="page-hospede" class="page">
+  <div style="max-width:1100px;margin:0 auto;padding:40px 24px;font-family:var(--font-body)">
+
+    <!-- Estado NÃO LOGADO -->
+    <div id="hospede-nao-logado">
+      <h1 style="font-size:28px;font-weight:800;margin-bottom:6px">👤 Portal do hóspede</h1>
+      <p style="color:#6b7280;margin-bottom:28px">Cadastre-se para reservar acomodações ou entre com seu CPF para ver suas reservas.</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+        <!-- Cadastrar -->
+        <div style="background:#f9fafb;padding:24px;border-radius:12px;border:1px solid #e5e7eb">
+          <h3 style="margin-bottom:16px;font-weight:700;font-size:18px">✨ Ainda não sou cadastrado</h3>
+          <p style="color:#6b7280;font-size:13px;margin-bottom:16px">Crie sua conta em segundos para reservar hospedagens.</p>
+          <div class="admin-form">
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Nome completo</label>
+            <input id="hp-nome" placeholder="Ex: Maria da Silva" class="admin-input">
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">CPF (11 dígitos, somente números)</label>
+            <input id="hp-cpf" placeholder="Ex: 12345678900" maxlength="14" class="admin-input">
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">E-mail para contato</label>
+            <input id="hp-email" type="email" placeholder="Ex: maria@email.com" class="admin-input">
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Telefone com DDD</label>
+            <input id="hp-telefone" placeholder="Ex: 31999998888" class="admin-input">
+            <button onclick="hospedeCadastrar()" class="admin-btn" style="background:#ec4899">Criar minha conta e entrar</button>
+          </div>
+        </div>
+
+        <!-- Entrar -->
+        <div style="background:#f9fafb;padding:24px;border-radius:12px;border:1px solid #e5e7eb">
+          <h3 style="margin-bottom:16px;font-weight:700;font-size:18px">🔑 Já tenho cadastro</h3>
+          <p style="color:#6b7280;font-size:13px;margin-bottom:16px">Informe seu CPF para acessar suas reservas.</p>
+          <div class="admin-form">
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">CPF cadastrado</label>
+            <input id="hp-login-cpf" placeholder="Ex: 12345678900" maxlength="14" class="admin-input">
+            <button onclick="hospedeEntrar()" class="admin-btn">Entrar no meu painel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estado LOGADO -->
+    <div id="hospede-logado" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+        <div>
+          <h1 style="font-size:28px;font-weight:800;margin-bottom:6px">Olá, <span id="hp-saudacao"></span> 👋</h1>
+          <p style="color:#6b7280">Gerencie suas reservas e crie novas hospedagens.</p>
+        </div>
+        <button onclick="hospedeSair()" class="admin-btn" style="max-width:160px;margin:0;background:#e5e7eb;color:#374151">Sair da conta</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+        <!-- Fazer reserva -->
+        <div>
+          <h3 style="margin-bottom:16px;font-weight:700;font-size:18px">🛏️ Fazer nova reserva</h3>
+          <div class="admin-form">
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Escolha o quarto</label>
+            <select id="hp-quartoId" class="admin-input"><option value="">-- Selecione o quarto --</option></select>
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Data de check-in</label>
+            <input id="hp-dataInicio" type="date" class="admin-input">
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Data de check-out</label>
+            <input id="hp-dataFim" type="date" class="admin-input">
+            <label style="font-size:13px;color:#374151;font-weight:600;margin-bottom:-6px">Número de hóspedes</label>
+            <input id="hp-hospedes" type="number" min="1" value="1" class="admin-input">
+            <label class="admin-check"><input type="checkbox" id="hp-berco"> 🍼 Precisamos de berço para bebê</label>
+            <button onclick="hospedeReservar()" class="admin-btn" style="background:#ec4899">Confirmar reserva</button>
+          </div>
+        </div>
+
+        <!-- Minhas reservas -->
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <h3 style="font-weight:700;font-size:18px;margin:0">📜 Minhas reservas</h3>
+            <button onclick="hospedeCarregarReservas()" class="admin-btn" style="max-width:120px;margin:0;padding:8px 12px">Atualizar</button>
+          </div>
+          <div id="hp-lista-reservas" class="admin-list"><p style="color:#9ca3af">Carregando...</p></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="hospede-msg" style="margin-top:20px;font-weight:700;font-size:15px;min-height:24px"></div>
+  </div>
+</div>
+
 <footer>
   <div class="footer-inner">
     <div class="footer-top">
@@ -863,6 +970,122 @@ function showPage(page) {
   window.scrollTo({ top: 0, behavior: "smooth" });
   if (page === 'listings' || page === 'home') carregarQuartosListagem();
   if (page === 'admin') adminTab('residencias');
+  if (page === 'hospede') hospedeInit();
+}
+
+// ===== PORTAL DO HÓSPEDE (auto-cadastro + reservas) =====
+const HOSPEDE_KEY = 'stayhub_hospede';
+function hospedeAtual() {
+  try { return JSON.parse(localStorage.getItem(HOSPEDE_KEY) || 'null'); } catch { return null; }
+}
+function hospedeMsg(m, ok) {
+  const el = document.getElementById('hospede-msg');
+  el.textContent = m; el.style.color = ok ? '#16a34a' : '#ef4444';
+  setTimeout(() => el.textContent='', 5000);
+}
+function hospedeInit() {
+  const h = hospedeAtual();
+  document.getElementById('hospede-nao-logado').style.display = h ? 'none' : '';
+  document.getElementById('hospede-logado').style.display = h ? '' : 'none';
+  if (h) {
+    document.getElementById('hp-saudacao').textContent = h.nome.split(' ')[0];
+    document.getElementById('nav-user-avatar').textContent = (h.nome[0] || 'U').toUpperCase();
+    carregarQuartosSelect('hp-quartoId');
+    hospedeCarregarReservas();
+  } else {
+    document.getElementById('nav-user-avatar').textContent = 'U';
+  }
+}
+async function hospedeCadastrar() {
+  const nome = document.getElementById('hp-nome').value.trim();
+  const cpf = document.getElementById('hp-cpf').value.trim();
+  const email = document.getElementById('hp-email').value.trim();
+  const telefone = document.getElementById('hp-telefone').value.trim();
+  if (!nome || !cpf) { hospedeMsg('❌ Nome e CPF são obrigatórios', false); return; }
+  const r = await fetch(`${API}/clientes`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ nome, cpf, email, telefone }) });
+  const d = await r.json().catch(()=>({}));
+  if (r.ok) {
+    localStorage.setItem(HOSPEDE_KEY, JSON.stringify(d));
+    hospedeMsg('✅ Conta criada com sucesso! Bem-vindo(a) à StayHub.', true);
+    hospedeInit();
+  } else hospedeMsg('❌ '+(d.message||'Erro ao criar conta'), false);
+}
+async function hospedeEntrar() {
+  const cpf = document.getElementById('hp-login-cpf').value.trim();
+  if (!cpf) { hospedeMsg('❌ Informe seu CPF', false); return; }
+  const r = await fetch(`${API}/clientes/cpf/${cpf}`);
+  const d = await r.json().catch(()=>({}));
+  if (r.ok) {
+    localStorage.setItem(HOSPEDE_KEY, JSON.stringify(d));
+    hospedeMsg('✅ Bem-vindo(a) de volta, '+d.nome+'!', true);
+    hospedeInit();
+  } else hospedeMsg('❌ CPF não encontrado. Cadastre-se primeiro.', false);
+}
+function hospedeSair() {
+  if (!confirm('Deseja sair da sua conta?')) return;
+  localStorage.removeItem(HOSPEDE_KEY);
+  hospedeInit();
+}
+async function hospedeReservar() {
+  const h = hospedeAtual();
+  if (!h) { hospedeMsg('❌ Você precisa estar logado', false); return; }
+  const payload = {
+    clienteId: h.id,
+    quartoId: parseInt(document.getElementById('hp-quartoId').value),
+    dataInicio: document.getElementById('hp-dataInicio').value,
+    dataFim: document.getElementById('hp-dataFim').value,
+    numHospedes: parseInt(document.getElementById('hp-hospedes').value),
+    solicitouBerco: document.getElementById('hp-berco').checked,
+  };
+  if (!payload.quartoId || !payload.dataInicio || !payload.dataFim || !payload.numHospedes) {
+    hospedeMsg('❌ Preencha todos os campos da reserva', false);
+    return;
+  }
+  const r = await fetch(`${API}/alugueis`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+  const d = await r.json().catch(()=>({}));
+  if (r.ok) {
+    hospedeMsg(`✅ Reserva confirmada! Total: R$ ${d.valorTotal.toFixed(2)}`, true);
+    ['hp-quartoId','hp-dataInicio','hp-dataFim','hp-hospedes'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('hp-hospedes').value = '1';
+    document.getElementById('hp-berco').checked = false;
+    hospedeCarregarReservas();
+  } else hospedeMsg('❌ '+(d.message||'Não foi possível reservar'), false);
+}
+async function hospedeCarregarReservas() {
+  const h = hospedeAtual();
+  if (!h) return;
+  const r = await fetch(`${API}/alugueis/cliente/${h.id}/historico`);
+  const arr = await r.json().catch(()=>[]);
+  document.getElementById('hp-lista-reservas').innerHTML = arr.length
+    ? arr.map(a => renderReservaHospede(a)).join('')
+    : '<p style="color:#9ca3af">Você ainda não tem reservas. Faça sua primeira à esquerda!</p>';
+}
+function renderReservaHospede(a) {
+  const badge = a.status === 'CANCELADO'
+    ? '<span style="background:#fee2e2;color:#991b1b;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;margin-left:8px">CANCELADA</span>'
+    : '<span style="background:#dcfce7;color:#166534;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;margin-left:8px">ATIVA</span>';
+  const btnCancelar = a.status === 'ATIVO'
+    ? `<button onclick="hospedeCancelar(${a.id})" class="admin-del" style="background:#f59e0b;color:#fff;border-color:#f59e0b" title="Cancelar reserva">🚫 Cancelar</button>`
+    : '';
+  const quartoInfo = a.quarto ? `${a.quarto.tipo} em ${a.quarto.residencia ? a.quarto.residencia.nome : '?'}` : '?';
+  return `<div class="admin-item">
+    <div style="flex:1;min-width:0">
+      <div style="font-size:15px;margin-bottom:4px"><strong>Reserva #${a.id}</strong>${badge}</div>
+      <div style="font-size:13px;color:#374151;line-height:1.6">
+        🛏️ <strong>Quarto:</strong> ${quartoInfo}<br>
+        📅 <strong>Período:</strong> ${a.dataInicio} → ${a.dataFim}<br>
+        👥 <strong>Nº de hóspedes:</strong> ${a.numHospedes}${a.solicitouBerco ? ' · 🍼 com berço' : ''}<br>
+        💰 <strong>Total:</strong> R$ ${a.valorTotal.toFixed(2)}
+      </div>
+    </div>
+    <div>${btnCancelar}</div>
+  </div>`;
+}
+async function hospedeCancelar(id) {
+  if (!confirm('Tem certeza que deseja cancelar a reserva #'+id+'?')) return;
+  const r = await fetch(`${API}/alugueis/${id}/cancelar`, { method:'PATCH' });
+  if (r.ok) { hospedeMsg('🚫 Reserva cancelada.', true); hospedeCarregarReservas(); }
+  else hospedeMsg('❌ Não foi possível cancelar', false);
 }
 
 document.querySelectorAll(".category-btn").forEach(btn => {
@@ -963,7 +1186,7 @@ function adminTab(tab) {
   if (tab==='quartos') { carregarQuartosAdmin(); carregarResidenciasSelect('q-residenciaId'); }
   if (tab==='clientes') carregarClientes();
   if (tab==='alugueis') { carregarAlugueis(); carregarQuartosSelect('al-quartoId'); carregarClientesSelect('al-clienteId'); carregarClientesSelect('h-clienteId'); }
-  if (tab==='tarifas') carregarFeriados();
+  if (tab==='tarifas') { carregarFeriados(); carregarRegrasSazonais(); }
   if (tab==='notificacoes') { carregarHistoricoNotif(); carregarLogs(); }
 }
 
@@ -974,10 +1197,24 @@ function adminMsg(m, ok) {
 }
 
 // --- Residências ---
+function renderResidenciaItem(r) {
+  const cidade = r.cidade || '?';
+  const uf = r.uf || '?';
+  return `<div class="admin-item">
+    <div style="flex:1;min-width:0">
+      <div style="font-size:15px;margin-bottom:4px"><strong>🏠 ${r.nome}</strong> <span style="color:#6b7280;font-size:12px">#${r.id}</span></div>
+      <div style="font-size:13px;color:#374151;line-height:1.6">
+        📍 <strong>Endereço:</strong> ${r.endereco}<br>
+        🌆 <strong>Cidade/UF:</strong> ${cidade}/${uf}
+      </div>
+    </div>
+    <button onclick="deletarResidencia(${r.id})" class="admin-del" title="Deletar residência">🗑</button>
+  </div>`;
+}
 async function carregarResidencias() {
   const res = await fetch(`${API}/residencias`).then(r=>r.json()).catch(()=>[]);
   document.getElementById('lista-residencias').innerHTML = res.length
-    ? res.map(r=>`<div class="admin-item"><div><strong>${r.nome}</strong><br><small>${r.endereco} – ${r.cidade}/${r.uf}</small></div><button onclick="deletarResidencia(${r.id})" class="admin-del">🗑</button></div>`).join('')
+    ? res.map(renderResidenciaItem).join('')
     : '<p style="color:#9ca3af">Nenhuma residência cadastrada.</p>';
 }
 async function criarResidencia() {
@@ -997,12 +1234,38 @@ async function carregarResidenciasSelect(id) {
 }
 
 // --- Quartos ---
+function renderQuartoItem(q) {
+  const residenciaNome = q.residencia ? q.residencia.nome : '?';
+  const camasInfo = q.tipo === 'INDIVIDUAL' && q.camasSolteiro != null
+    ? `${q.camasSolteiro} cama(s) solteiro`
+    : q.tipo === 'DUPLO' && q.tipoCamaCasal
+      ? `cama ${q.tipoCamaCasal}${q.possuiBercoDisponivel ? ' + berço disponível' : ''}`
+      : q.tipo === 'FAMILIA'
+        ? `${q.camasSolteiro||0} solteiro + ${q.camasCasal||0} casal + ${q.camasQueenKing||0} queen/king · ${q.quantidadeAmbientes||1} ambiente(s)`
+        : '';
+  const adicionais = [q.possuiAR ? '❄️ AR' : null, q.possuiHidro ? '💧 Hidro' : null].filter(Boolean).join(' · ');
+  return `<div class="admin-item">
+    <div style="flex:1;min-width:0">
+      <div style="font-size:15px;margin-bottom:4px">
+        <strong>Quarto #${q.id}</strong>
+        <span style="background:#e0e7ff;color:#3730a3;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;margin-left:8px">${q.tipo}</span>
+      </div>
+      <div style="font-size:13px;color:#374151;line-height:1.6">
+        🏠 <strong>Residência:</strong> ${residenciaNome}<br>
+        💰 <strong>Valor base:</strong> R$ ${q.valorBase.toFixed(2)}/noite<br>
+        👥 <strong>Capacidade:</strong> ${q.capacidadeMaxima} hóspede(s)<br>
+        🛏️ <strong>Camas:</strong> ${camasInfo}${adicionais ? '<br>✨ <strong>Adicionais:</strong> '+adicionais : ''}
+      </div>
+    </div>
+    <button onclick="deletarQuarto(${q.id})" class="admin-del" title="Deletar quarto">🗑</button>
+  </div>`;
+}
 async function carregarQuartosAdmin() {
   const filtro = document.getElementById('q-filtro-tipo')?.value || '';
   const url = filtro ? `${API}/quartos?tipo=${filtro}` : `${API}/quartos`;
   const res = await fetch(url).then(r=>r.json()).catch(()=>[]);
   document.getElementById('lista-quartos').innerHTML = res.length
-    ? res.map(q=>`<div class="admin-item"><div><strong>${q.residencia?q.residencia.nome:'?'}</strong> <span style="background:#e0e7ff;color:#3730a3;border-radius:6px;padding:2px 8px;font-size:12px">${q.tipo}</span><br><small>R$ ${q.valorBase}/noite · Cap. ${q.capacidadeMaxima}${q.possuiAR?' · AR':''}${q.possuiHidro?' · Hidro':''}</small></div><button onclick="deletarQuarto(${q.id})" class="admin-del">🗑</button></div>`).join('')
+    ? res.map(renderQuartoItem).join('')
     : '<p style="color:#9ca3af">Nenhum quarto encontrado com esse filtro.</p>';
 }
 async function criarQuarto() {
@@ -1034,7 +1297,15 @@ async function carregarQuartosSelect(id) {
 async function carregarClientes() {
   const res = await fetch(`${API}/clientes`).then(r=>r.json()).catch(()=>[]);
   document.getElementById('lista-clientes').innerHTML = res.length
-    ? res.map(c=>`<div class="admin-item"><div><strong>${c.nome}</strong><br><small>CPF: ${c.cpf}${c.email?' · '+c.email:''}</small></div><button onclick="deletarCliente(${c.id})" class="admin-del">🗑</button></div>`).join('')
+    ? res.map(c => `<div class="admin-item">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:15px;margin-bottom:4px"><strong>👤 ${c.nome}</strong> <span style="color:#6b7280;font-size:12px">#${c.id}</span></div>
+          <div style="font-size:13px;color:#374151;line-height:1.6">
+            🆔 <strong>CPF:</strong> ${c.cpf}${c.email ? '<br>✉️ <strong>E-mail:</strong> '+c.email : ''}${c.telefone ? '<br>📞 <strong>Telefone:</strong> '+c.telefone : ''}
+          </div>
+        </div>
+        <button onclick="deletarCliente(${c.id})" class="admin-del" title="Deletar cliente">🗑</button>
+      </div>`).join('')
     : '<p style="color:#9ca3af">Nenhum cliente cadastrado.</p>';
 }
 async function criarCliente() {
@@ -1056,12 +1327,31 @@ async function carregarClientesSelect(id) {
 // --- Aluguéis ---
 function renderAluguelItem(a) {
   const badge = a.status === 'CANCELADO'
-    ? '<span style="background:#fee2e2;color:#991b1b;border-radius:6px;padding:2px 8px;font-size:12px;margin-left:6px">CANCELADO</span>'
-    : '<span style="background:#dcfce7;color:#166534;border-radius:6px;padding:2px 8px;font-size:12px;margin-left:6px">ATIVO</span>';
+    ? '<span style="background:#fee2e2;color:#991b1b;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;margin-left:8px">CANCELADO</span>'
+    : '<span style="background:#dcfce7;color:#166534;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;margin-left:8px">ATIVO</span>';
   const btnCancelar = a.status === 'ATIVO'
-    ? `<button onclick="cancelarAluguel(${a.id})" class="admin-del" style="background:#f59e0b;color:#fff;border-color:#f59e0b" title="Cancelar aluguel">🚫</button>`
+    ? `<button onclick="cancelarAluguel(${a.id})" class="admin-del" style="background:#f59e0b;color:#fff;border-color:#f59e0b" title="Cancelar reserva">🚫</button>`
     : '';
-  return `<div class="admin-item"><div><strong>#${a.id} · ${a.cliente?a.cliente.nome:'?'}</strong>${badge}<br><small>${a.dataInicio} → ${a.dataFim} · ${a.numHospedes} hósp. · Diária: R$${a.valorDiaria.toFixed(2)} · <strong>Total: R$${a.valorTotal.toFixed(2)}</strong></small></div><div style="display:flex;gap:4px">${btnCancelar}<button onclick="deletarAluguel(${a.id})" class="admin-del">🗑</button></div></div>`;
+  const clienteNome = a.cliente ? a.cliente.nome : '?';
+  const quartoInfo = a.quarto
+    ? `${a.quarto.tipo} em ${a.quarto.residencia ? a.quarto.residencia.nome : '?'}`
+    : 'Quarto ?';
+  const berco = a.solicitouBerco ? ' · 🍼 com berço' : '';
+  return `<div class="admin-item">
+    <div style="flex:1;min-width:0">
+      <div style="font-size:15px;margin-bottom:4px">
+        <strong>Reserva #${a.id}</strong> ${badge}
+      </div>
+      <div style="font-size:13px;color:#374151;line-height:1.6">
+        👤 <strong>Hóspede titular:</strong> ${clienteNome}<br>
+        🛏️ <strong>Quarto:</strong> ${quartoInfo}<br>
+        📅 <strong>Período:</strong> ${a.dataInicio} → ${a.dataFim}<br>
+        👥 <strong>Nº de hóspedes:</strong> ${a.numHospedes}${berco}<br>
+        💰 <strong>Diária:</strong> R$ ${a.valorDiaria.toFixed(2)} · <strong>Total:</strong> R$ ${a.valorTotal.toFixed(2)}
+      </div>
+    </div>
+    <div style="display:flex;gap:4px;align-self:flex-start">${btnCancelar}<button onclick="deletarAluguel(${a.id})" class="admin-del" title="Deletar registro">🗑</button></div>
+  </div>`;
 }
 async function carregarAlugueis() {
   const res = await fetch(`${API}/alugueis`).then(r=>r.json()).catch(()=>[]);
@@ -1099,6 +1389,23 @@ async function deletarAluguel(id) {
 // =========================================================
 // TARIFAS (Sprint 4 - Strategy + Decorator + Singleton)
 // =========================================================
+async function carregarRegrasSazonais() {
+  const res = await fetch(`${API}/tarifas/regras-sazonais`).then(r=>r.json()).catch(()=>({}));
+  document.getElementById('rs-alta').checked = !!res.altaTemporada;
+  document.getElementById('rs-baixa').checked = !!res.baixaTemporada;
+  document.getElementById('rs-desc').checked = !!res.descontoClienteFrequente;
+}
+async function atualizarRegrasSazonais() {
+  const payload = {
+    altaTemporada: document.getElementById('rs-alta').checked,
+    baixaTemporada: document.getElementById('rs-baixa').checked,
+    descontoClienteFrequente: document.getElementById('rs-desc').checked,
+  };
+  const r = await fetch(`${API}/tarifas/regras-sazonais`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+  if (r.ok) adminMsg('✅ Regras sazonais atualizadas', true);
+  else adminMsg('❌ Erro ao atualizar regras', false);
+}
+
 async function carregarFeriados() {
   const res = await fetch(`${API}/tarifas/feriados`).then(r=>r.json()).catch(()=>[]);
   const arr = Array.isArray(res) ? res : [];

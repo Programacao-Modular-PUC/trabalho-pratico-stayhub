@@ -28,7 +28,7 @@ class GerenciadorTarifasTest {
     }
 
     @Test
-    @DisplayName("Feriado adicionado aumenta o valor em 20% (empilhado a alta temporada)")
+    @DisplayName("Feriado adicionado aumenta o valor em 20% sobre o valor base")
     void feriado_aplicaAdicionalDe20Porcento() {
         LocalDate natal = LocalDate.of(2026, 12, 25);
         gerenciador.adicionarFeriado(natal);
@@ -37,8 +37,23 @@ class GerenciadorTarifasTest {
             200.0, natal, natal.plusDays(1), null, 0);
         double valor = gerenciador.calcular(ctx);
 
-        // 200 * 1.35 (alta temporada de dezembro) * 1.20 (feriado) = 324
-        assertEquals(324.0, valor, 0.01);
+        // sem alta temporada ativa: 200 * 1.20 (feriado) = 240
+        assertEquals(240.0, valor, 0.01);
+    }
+
+    @Test
+    @DisplayName("Alta temporada opt-in: 200 -> 270 em mes de alta")
+    void altaTemporada_aplicaSomenteQuandoAtivada() {
+        LocalDate natal = LocalDate.of(2026, 12, 25);
+        ContextoTarifacao ctx = new ContextoTarifacao(
+            200.0, natal, natal.plusDays(1), null, 0);
+
+        // sem ativar: mantem valor base
+        assertEquals(200.0, gerenciador.calcular(ctx), 0.01);
+
+        // ativando: aplica +35% (dezembro esta em alta)
+        gerenciador.setAltaTemporadaAtiva(true);
+        assertEquals(270.0, gerenciador.calcular(ctx), 0.01);
     }
 
     @Test
@@ -53,8 +68,10 @@ class GerenciadorTarifasTest {
     }
 
     @Test
-    @DisplayName("Cliente frequente recebe desconto empilhado ao valor base")
+    @DisplayName("Cliente frequente recebe desconto quando decorator esta ativo")
     void clienteFrequente_recebeDesconto() {
+        gerenciador.setDescontoFrequenteAtivo(true);
+
         LocalDate junho = LocalDate.of(2027, 6, 10);
         ContextoTarifacao ctxOcasional = new ContextoTarifacao(
             100.0, junho, junho.plusDays(1), null, 0);

@@ -29,6 +29,11 @@ public class ClienteController {
         return clienteService.findById(id);
     }
 
+    @GetMapping("/cpf/{cpf}")
+    public Cliente findByCpf(@PathVariable String cpf) {
+        return clienteService.findByCpf(cpf);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Cliente create(@RequestBody @Valid Cliente cliente) {
